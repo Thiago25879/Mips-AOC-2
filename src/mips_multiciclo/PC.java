@@ -1,3 +1,4 @@
+//Contador de programa
 
 package mips_multiciclo;
 
