@@ -92,7 +92,6 @@ public class Unidade_de_Controle {
                     }
                     break;
                 case 4:
-                    funct = 0;
                     if (opcode == 0b11) {
                         Registradores.Registradores[31] = PC.Contador + 1;
                     }
