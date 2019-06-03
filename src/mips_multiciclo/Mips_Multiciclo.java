@@ -75,7 +75,7 @@ public class Mips_Multiciclo {
                         Unidade_de_Controle.decodeULA(Memoria_instrucoes.getMemoria()[PC.Contador]);
                     }
                     break;
-                /*case 6:
+                case 6:
                     Memoria_instrucoes.setMemoria(PC.Contador,Memoria_instrucoes.decode("ADDI $s0, $zero, 0"));PC.Contador++;
                     Memoria_instrucoes.setMemoria(PC.Contador,Memoria_instrucoes.decode("ADDI $s1, $zero, 0"));PC.Contador++;
                     Memoria_instrucoes.setMemoria(PC.Contador,Memoria_instrucoes.decode("ADDI $s2, $zero, 0"));PC.Contador++;
@@ -98,7 +98,7 @@ public class Mips_Multiciclo {
                     Memoria_instrucoes.setMemoria(PC.Contador,Memoria_instrucoes.decode("JR $ra"));PC.Contador++;
                     Memoria_instrucoes.setMemoria(PC.Contador,Memoria_instrucoes.decode("ADDI $s6, $s2, 3700"));PC.Contador++;
                     Memoria_instrucoes.setMemoria(PC.Contador,Memoria_instrucoes.decode("SLL $s6, $s6, 2"));PC.Contador++;
-                    break;*/
+                    break;
                 case 0:
                     System.out.println("\n\nEncerrando programa ............\n\n");
                     break;
