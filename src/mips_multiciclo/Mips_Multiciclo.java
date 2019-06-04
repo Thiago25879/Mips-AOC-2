@@ -3,14 +3,20 @@
 package mips_multiciclo;
 
 import java.util.Scanner;
+import javax.swing.JFrame;
 
 public class Mips_Multiciclo { 
 
     public static void main(String[] args) {
+        Frame frame = new Frame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(900, 600);
+        frame.setVisible(true);
         int opt = 1;
         String inst;
         Scanner scan = new Scanner(System.in);
         do{
+            frame.inserirInterface();
             System.out.println("-----Menu-----\n  1-Inserir instrução\n  2-Mostrar Regs\n  3-Mostrar Memoria Inst\n  4-Mostrar Memoria dados\n  5-Executar\n  0-Encerrar execução\nEscolha a opção desejada");
             opt = scan.nextInt();
             switch(opt){
@@ -107,7 +113,7 @@ public class Mips_Multiciclo {
                     break;
             }
         }while(opt != 0);
-        
+         
     }
 
 }

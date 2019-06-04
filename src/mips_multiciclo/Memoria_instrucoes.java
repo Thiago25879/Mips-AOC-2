@@ -6,7 +6,17 @@ public class Memoria_instrucoes {
 
     private static int[] memoria = new int[128];
 
-    public Memoria_instrucoes() {
+    public static String toString(int x) {
+    // You can change this to suite the presentation of a list item
+        return x*4 + ": " + Integer.toHexString(memoria[x]).toUpperCase();
+    }
+    
+    public static String[] tostring(){
+        String temp[] = new String[128];
+        for(int x = 0;x < 128;x++){
+            temp[x] = toString(x);
+        }
+        return temp;
     }
 
     public static int decode(String instrucao) {
