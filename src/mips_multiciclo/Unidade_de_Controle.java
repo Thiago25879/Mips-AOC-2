@@ -93,7 +93,7 @@ public class Unidade_de_Controle {
                     break;
                 case 4:
                     if (opcode == 0b11) {
-                        Registradores.Registradores[31] = PC.Contador + 1;
+                        Registradores.Registradores[31] = (PC.Contador + 1)*4;
                     }
                     PC.Contador = ((inst & 0b00000011111111111111111111111111) - 1)/4;
                     break;
