@@ -8,12 +8,12 @@ public class Mips_Multiciclo {
 
     public static void main(String[] args) {
 
-        Memoria_principal.inicializarMemoria();
+        inicializarMemoria();
         Frame frame = new Frame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(900, 600);
+        frame.setSize(956, 550);
         frame.setVisible(true);
-    
+
         /*
         int opt;
         String inst;
@@ -136,16 +136,37 @@ public class Mips_Multiciclo {
             }
         } while (opt != 0);
 
-    */
+         */
     }
 
     public static void executar() {
         PC.Contador = 0;
-        for (PC.Contador = 0; PC.Contador < 40; PC.Contador++) {
-            Unidade_de_Controle.decodeULA(Memoria_instrucoes.getMemoria()[PC.Contador]);
+        for (PC.Contador = 0; PC.Contador < 127; PC.Contador++) {
+            Memoria_instrucoes.memoria[PC.Contador] = Memoria_instrucoes.decode(Memoria_principal.memoria[PC.Contador]);
+        }
+        for (PC.Contador = 0; PC.Contador < 127; PC.Contador++) {
+            Unidade_de_Controle.decodeULA(Memoria_instrucoes.memoria[PC.Contador]);
         }
     }
-    
-    
+
+    public static void inicializarMemoria() {
+        for (int x = 0; x < 128; x++) {
+            Memoria_principal.memoria[x] = "";
+        }
+    }
+
+    public static void zerarSimulador() {
+        inicializarMemoria();
+        PC.Contador = 0;
+        for (int x = 0; x < Registradores.Registradores.length; x++) {
+            Registradores.Registradores[x] = 0;
+        }
+        for (int x = 0; x < Memoria_dados.memoria.length; x++) {
+            Memoria_dados.memoria[x] = 0;
+        }
+        for (int x = 0; x < Memoria_instrucoes.memoria.length; x++) {
+            Memoria_instrucoes.memoria[x] = 0;
+        }
+    }
 
 }

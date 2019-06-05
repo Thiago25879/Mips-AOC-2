@@ -38,7 +38,7 @@ public class Unidade_de_Controle {
                     }
                     if (funct == 0b001000) {
                         FonteB = Registradores.Registradores[0];
-                        PC.Contador = (ULA.Operacao(opcode, funct, FonteA, FonteB)) - 1;
+                        PC.Contador = ((ULA.Operacao(opcode, funct, FonteA, FonteB)) - 1) / 4;
                         return;
                     }
                     FonteB = Registradores.Registradores[(inst >> 16) & 0b11111];
@@ -86,16 +86,16 @@ public class Unidade_de_Controle {
                     FonteA = Registradores.Registradores[(inst >> 21) & 0b11111];
                     FonteB = inst & 0b1111111111111111;
                     if ((opcode & 0b101000) == 0b101000) {//If = SW    else = LW
-                        Memoria_dados.memoria[ULA.Operacao(opcode, funct, FonteA, FonteB)] = Registradores.Registradores[(inst >> 16) & 0b11111];
+                        Memoria_dados.memoria[(ULA.Operacao(opcode, funct, FonteA, FonteB))/4] = Registradores.Registradores[(inst >> 16) & 0b11111];
                     } else {
-                        Registradores.Registradores[(inst >> 16) & 0b11111] = Memoria_dados.memoria[ULA.Operacao(opcode, funct, FonteA, FonteB)];
+                        Registradores.Registradores[(inst >> 16) & 0b11111] = Memoria_dados.memoria[(ULA.Operacao(opcode, funct, FonteA, FonteB))/4];
                     }
                     break;
                 case 4:
                     if (opcode == 0b11) {
                         Registradores.Registradores[31] = PC.Contador + 1;
                     }
-                    PC.Contador = (inst & 0b00000011111111111111111111111111) - 1;
+                    PC.Contador = ((inst & 0b00000011111111111111111111111111) - 1)/4;
                     break;
             }
 
