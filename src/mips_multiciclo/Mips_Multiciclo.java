@@ -5,6 +5,9 @@ import java.util.Scanner;
 import javax.swing.JFrame;
 
 public class Mips_Multiciclo {
+    
+    static int tamCache = 0;
+    static int vias = 1;
 
     public static void main(String[] args) {
 
@@ -12,8 +15,8 @@ public class Mips_Multiciclo {
         Frame frame = new Frame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(956, 550);
-        frame.setVisible(true);
-
+        frame.mostrarConfig();
+        frame.setVisible(false);
         /*
         int opt;
         String inst;
