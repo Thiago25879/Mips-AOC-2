@@ -2,7 +2,7 @@ package mips_multiciclo;
 
 public class Memoria_principal {
 
-    public static String memoria[] = new String[128];
+    public static String memoria[] = new String[Mips_Multiciclo.tamPrincipal];
 
     public static String setMemoriaMult(int local, String instrucoes){
         boolean test = true;
@@ -38,8 +38,8 @@ public class Memoria_principal {
     }
 
     public static String[] paraString() {
-        String temp[] = new String[128];
-        for (int x = 0; x < 128; x++) {
+        String temp[] = new String[Mips_Multiciclo.tamPrincipal];
+        for (int x = 0; x < Mips_Multiciclo.tamPrincipal; x++) {
             temp[x] = toString(x);
         }
         return temp;
