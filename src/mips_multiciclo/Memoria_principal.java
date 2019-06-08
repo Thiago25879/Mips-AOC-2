@@ -4,30 +4,35 @@ public class Memoria_principal {
 
     public static String memoria[] = new String[Mips_Multiciclo.tamPrincipal];
 
-    public static String setMemoriaMult(int local, String instrucoes){
+    public static String setMemoriaMult(int local, String instrucoes) {
         boolean test = true;
         String[] temp = instrucoes.split("\n");
-        for(int x = 0;x < temp.length;x++){
-            if(!(setMemoria(local+x,temp[x].trim()))){
-                temp[x] = "  "+temp[x];
+        for (int x = 0; x < temp.length; x++) {
+            if (!(setMemoria(local + x, temp[x].trim()))) {
+                temp[x] = "  " + temp[x];
                 test = false;
             }
         }
-        if(!test){
+        if (!test) {
             String retorno = "";
-            for(int x = 0;x < temp.length;x++){
+            for (int x = 0; x < temp.length; x++) {
                 retorno = retorno + temp[x] + "\n";
-            } 
+            }
             return retorno;
-        }else{
+        } else {
             return "";
         }
     }
 
     public static boolean setMemoria(int local, String instrucao) {
-        if (Memoria_instrucoes.decode(instrucao) != 0) {
-            Memoria_principal.memoria[local] = instrucao;
-            return true;
+        try {
+            if (Memoria_instrucoes.decode(instrucao) != 0) {
+                Memoria_principal.memoria[local] = instrucao;
+                return true;
+            }
+
+        } catch (ArrayIndexOutOfBoundsException e) {
+
         }
         return false;
     }

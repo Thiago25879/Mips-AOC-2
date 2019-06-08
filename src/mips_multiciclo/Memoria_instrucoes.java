@@ -47,7 +47,7 @@ public class Memoria_instrucoes {
 
     public void setMemoria(int endereco) {
 
-        int via = encontrarBloco(endereco, false);
+        int via = encontrarBloco(endereco, true);
         Bloco bloco = this.Blocos[(endereco >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1][via];
         bloco.Validade = true;
         bloco.Tag = endereco >> (2 + Mips_Multiciclo.indiceTam);
@@ -75,7 +75,7 @@ public class Memoria_instrucoes {
             for (int x = 0; x < Mips_Multiciclo.vias; x++) {
                 if (this.Blocos[indice][x].LRU == 1) {
                     if (tipo) {
-                        this.Blocos[indice][x].LRU = Mips_Multiciclo.vias;
+                        this.Blocos[indice][x].LRU = Mips_Multiciclo.vias +1;
                     }
                     bloco = x;
                 }

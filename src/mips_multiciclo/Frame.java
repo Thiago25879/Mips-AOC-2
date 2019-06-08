@@ -72,7 +72,7 @@ public class Frame extends JFrame {
                 if (bloco == null) {
                     instrucMem.setMemoria(PC.Contador);
                 }
-                Unidade_de_Controle.decodeULA(instrucMem.Blocos[(PC.Contador >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1][instrucMem.encontrarBloco(PC.Contador, true)].Palavra[PC.Contador & 0b11]);
+                Unidade_de_Controle.decodeULA(instrucMem.Blocos[(PC.Contador >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1][instrucMem.encontrarBloco(PC.Contador, false)].Palavra[PC.Contador & 0b11]);
             }
         }
         inserirInterface();
@@ -433,7 +433,7 @@ public class Frame extends JFrame {
                             .addComponent(jTextField2)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addGap(262, 262, 262)
+                        .addGap(276, 276, 276)
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)))
