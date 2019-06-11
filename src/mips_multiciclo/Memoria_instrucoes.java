@@ -45,9 +45,9 @@ public class Memoria_instrucoes {
         return null;
     }
 
-    public void setMemoria(int endereco) {
+    public int setMemoria(int endereco) {
 
-        int via = encontrarBloco(endereco, true);
+        int via = encontrarBloco(endereco);
         Bloco bloco = this.Blocos[(endereco >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1][via];
         bloco.Validade = true;
         bloco.Tag = endereco >> (2 + Mips_Multiciclo.indiceTam);
@@ -66,22 +66,22 @@ public class Memoria_instrucoes {
         bloco.Palavra[1] = Memoria_instrucoes.decode(Memoria_principal.memoria[endereco + 1]);
         bloco.Palavra[2] = Memoria_instrucoes.decode(Memoria_principal.memoria[endereco + 2]);
         bloco.Palavra[3] = Memoria_instrucoes.decode(Memoria_principal.memoria[endereco + 3]);
+        return via;
     }
 
-    public int encontrarBloco(int endereco, boolean tipo) {
+    public int encontrarBloco(int endereco) {
         if (Mips_Multiciclo.vias != 1) {
             int indice = (endereco >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1;
             int bloco = 0;
             for (int x = 0; x < Mips_Multiciclo.vias; x++) {
                 if (this.Blocos[indice][x].LRU == 1) {
-                    if (tipo) {
-                        this.Blocos[indice][x].LRU = Mips_Multiciclo.vias +1;
-                    }
+                    this.Blocos[indice][x].LRU = Mips_Multiciclo.vias + 1;
+
                     bloco = x;
+                    System.out.println(bloco + "," + indice);
                 }
-                if (tipo) {
-                    this.Blocos[indice][x].LRU--;
-                }
+                this.Blocos[indice][x].LRU--;
+
             }
             return bloco;
         } else {

@@ -64,16 +64,47 @@ public class Frame extends JFrame {
     }
 
     public void executar() {
+        int via = 0;
         PC.Contador = 0;
         this.instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
         for (PC.Contador = 0; PC.Contador < Mips_Multiciclo.tamPrincipal; PC.Contador++) {
             if (Memoria_instrucoes.decode(Memoria_principal.memoria[PC.Contador]) != 0) {
                 Bloco bloco = instrucMem.buscarEnd(PC.Contador);
                 if (bloco == null) {
-                    instrucMem.setMemoria(PC.Contador);
+                    via = instrucMem.setMemoria(PC.Contador);
                 }
-                Unidade_de_Controle.decodeULA(instrucMem.Blocos[(PC.Contador >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1][instrucMem.encontrarBloco(PC.Contador, false)].Palavra[PC.Contador & 0b11]);
+                Unidade_de_Controle.decodeULA(instrucMem.Blocos[(PC.Contador >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1][via].Palavra[PC.Contador & 0b11]);
             }
+        }
+        PC.Contador--;
+        inserirInterface();
+    }
+
+    public void passo_a_passo() {
+        int via = 0;
+        if (jButton3.isEnabled()) {
+            PC.Contador = 0;
+            jButton3.setEnabled(false);
+            jTextField1.setEnabled(false);
+            jTextField2.setEnabled(false);
+            this.instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
+        }
+        while (PC.Contador < Mips_Multiciclo.tamPrincipal && Memoria_instrucoes.decode(Memoria_principal.memoria[PC.Contador]) == 0) {
+            PC.Contador++;
+        }
+        if (PC.Contador == Mips_Multiciclo.tamPrincipal) {
+            PC.Contador--;
+        } else {
+            Bloco bloco = instrucMem.buscarEnd(PC.Contador);
+            if (bloco == null) {
+                via = instrucMem.setMemoria(PC.Contador);
+            }
+            Unidade_de_Controle.decodeULA(instrucMem.Blocos[(PC.Contador >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1][via].Palavra[PC.Contador & 0b11]);
+        }
+        if (PC.Contador == Mips_Multiciclo.tamPrincipal - 1) {
+
+        } else {
+            PC.Contador++;
         }
         inserirInterface();
     }
@@ -94,7 +125,9 @@ public class Frame extends JFrame {
             Memoria_dados.memoria[x] = 0;
         }
         instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
-
+        jButton3.setEnabled(true);
+        jTextField1.setEnabled(true);
+        jTextField2.setEnabled(true);
     }
 
     /**
@@ -288,7 +321,7 @@ public class Frame extends JFrame {
         jLabel5.setFont(new java.awt.Font("URW Palladio L", 1, 36)); // NOI18N
         jLabel5.setText("MIPS");
 
-        jButton2.setText("Ciclo a ciclo");
+        jButton2.setText("Passo a Passo");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -489,7 +522,7 @@ public class Frame extends JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
+        passo_a_passo();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
@@ -595,6 +628,7 @@ public class Frame extends JFrame {
                     this.setVisible(true);
                 }
                 zerarSimulador();
+                inserirInterface();
                 jDialog1.setVisible(false);
             }
         } catch (NumberFormatException e) {
@@ -627,8 +661,7 @@ public class Frame extends JFrame {
     }//GEN-LAST:event_jTextField3FocusLost
 
     private void jLabel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel6MouseClicked
-        instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
-        inserirInterface();
+
     }//GEN-LAST:event_jLabel6MouseClicked
 
     private void jSpinner1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner1StateChanged
