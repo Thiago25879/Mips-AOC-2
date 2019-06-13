@@ -88,7 +88,8 @@ public class Unidade_de_Controle {
                     funct = 0;
                     FonteA = Registradores.Registradores[(inst >> 21) & 0b11111];
                     FonteB = inst & 0b1111111111111111;
-                    indice = (FonteB >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1;
+                    indice = (FonteB) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1;
+                    System.out.println( ((FonteB >> 2) + " - ") + ((pow(2, Mips_Multiciclo.indiceTam)) - 1) +  " - " + Mips_Multiciclo.indiceTam + " - " + (pow(2, Mips_Multiciclo.indiceTam)));
                     via = Mips_Multiciclo.frame.dadosMem.buscarEnd((ULA.Operacao(opcode, funct, FonteA, FonteB)) / 4);
                     if (via == -1) {
                         via = Mips_Multiciclo.frame.dadosMem.setMemoria((ULA.Operacao(opcode, funct, FonteA, FonteB)) / 4);

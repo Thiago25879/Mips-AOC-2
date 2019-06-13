@@ -18,7 +18,6 @@ public class Memoria_instrucoes {
     }
 
     public String toString(int indice, int bloco, int palavra) {
-        //System.out.println(indice + " - " + palavra + " - " + bloco);
         return "Ind. " + indice + ", Palav. " + palavra + " : " + Integer.toHexString(Blocos[indice][bloco].Palavra[palavra]).toUpperCase();
     }
 
@@ -76,9 +75,7 @@ public class Memoria_instrucoes {
             for (int x = 0; x < Mips_Multiciclo.vias; x++) {
                 if (this.Blocos[indice][x].LRU == 1) {
                     this.Blocos[indice][x].LRU = Mips_Multiciclo.vias + 1;
-
                     bloco = x;
-                    System.out.println(bloco + "," + indice);
                 }
                 this.Blocos[indice][x].LRU--;
 
