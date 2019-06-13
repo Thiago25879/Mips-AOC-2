@@ -8,6 +8,7 @@
       </Properties>
       <Events>
         <EventHandler event="componentHidden" listener="java.awt.event.ComponentListener" parameters="java.awt.event.ComponentEvent" handler="jDialog1ComponentHidden"/>
+        <EventHandler event="windowOpened" listener="java.awt.event.WindowListener" parameters="java.awt.event.WindowEvent" handler="jDialog1WindowOpened"/>
       </Events>
 
       <Layout>
@@ -350,6 +351,9 @@
         </Property>
         <Property name="text" type="java.lang.String" value="Registradores"/>
       </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jLabel1MouseClicked"/>
+      </Events>
     </Component>
     <Container class="javax.swing.JScrollPane" name="jScrollPane2">
       <AuxValues>
@@ -411,6 +415,9 @@
         </Property>
         <Property name="text" type="java.lang.String" value="   Cache Instru&#xe7;&#xf5;es: Via"/>
       </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jLabel3MouseClicked"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="jButton1">
       <Properties>
@@ -468,6 +475,9 @@
         </Property>
         <Property name="text" type="java.lang.String" value="   Cache Dados: Via"/>
       </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jLabel4MouseClicked"/>
+      </Events>
     </Component>
     <Container class="javax.swing.JScrollPane" name="jScrollPane1">
       <AuxValues>
@@ -505,6 +515,9 @@
         <Property name="text" type="java.lang.String" value=" Mem&#xf3;ria Principal"/>
         <Property name="toolTipText" type="java.lang.String" value=""/>
       </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jLabel2MouseClicked"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="jTextField2">
       <Properties>

@@ -6,10 +6,13 @@
 package mips_multiciclo;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import static java.awt.event.KeyEvent.VK_ENTER;
 import static java.lang.Math.pow;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -17,6 +20,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 /**
  *
@@ -68,7 +72,7 @@ public class Frame extends JFrame {
         int via = 0;
         PC.Contador = 0;
         this.instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
-        for (PC.Contador = 0; PC.Contador < Mips_Multiciclo.tamPrincipal; PC.Contador++) {
+        for (PC.Contador = 0; PC.Contador < Mips_Multiciclo.tamPrincipal / 2; PC.Contador++) {
             if (Memoria_instrucoes.decode(Memoria_principal.memoria[PC.Contador]) != 0) {
                 via = instrucMem.buscarEnd(PC.Contador);
                 if (via == -1) {
@@ -85,45 +89,52 @@ public class Frame extends JFrame {
         int via = 0;
         if (jButton3.isEnabled()) {
             PC.Contador = 0;
+            jList1.setEnabled(false);
             jButton3.setEnabled(false);
             jTextField1.setEnabled(false);
             jTextField2.setEnabled(false);
             jButton1.setText("Parar");
             this.instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
             this.dadosMem = new Memoria_dados(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
-        }
-        while (PC.Contador < Mips_Multiciclo.tamPrincipal && Memoria_instrucoes.decode(Memoria_principal.memoria[PC.Contador]) == 0) {
-            PC.Contador++;
-        }
-        if (PC.Contador == Mips_Multiciclo.tamPrincipal) {
-            PC.Contador--;
         } else {
-            via = instrucMem.buscarEnd(PC.Contador);
-            if (via == -1) {
-                via = instrucMem.setMemoria(PC.Contador);
+            while (PC.Contador < Mips_Multiciclo.tamPrincipal / 2 && Memoria_instrucoes.decode(Memoria_principal.memoria[PC.Contador]) == 0) {
+                PC.Contador++;
             }
-            Unidade_de_Controle.decodeULA(instrucMem.Blocos[(PC.Contador >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1][via].Palavra[PC.Contador & 0b11]);
-        }
-        if (PC.Contador == Mips_Multiciclo.tamPrincipal - 1) {
+            if (PC.Contador == Mips_Multiciclo.tamPrincipal / 2) {
+                PC.Contador--;
+            } else {
+                via = instrucMem.buscarEnd(PC.Contador);
+                if (via == -1) {
+                    via = instrucMem.setMemoria(PC.Contador);
+                }
+                Unidade_de_Controle.decodeULA(instrucMem.Blocos[(PC.Contador >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1][via].Palavra[PC.Contador & 0b11]);
+            }
+            if (PC.Contador == Mips_Multiciclo.tamPrincipal / 2 - 1) {
 
-        } else {
-            PC.Contador++;
+            } else {
+                PC.Contador++;
+            }
         }
         inserirInterface();
+        jList1.setSelectedIndex(PC.Contador);
     }
 
     public void inicializarMemoria() {
-        for (int x = 0; x < Mips_Multiciclo.tamPrincipal; x++) {
+        for (int x = 0; x < Mips_Multiciclo.tamPrincipal / 2; x++) {
             Memoria_principal.memoria[x] = "";
+        }
+    }
+
+    public void inicializarRegistradores() {
+        for (int x = 0; x < Registradores.Registradores.length; x++) {
+            Registradores.Registradores[x] = 0;
         }
     }
 
     public void zerarSimulador() {
         inicializarMemoria();
+        inicializarRegistradores();
         PC.Contador = 0;
-        for (int x = 0; x < Registradores.Registradores.length; x++) {
-            Registradores.Registradores[x] = 0;
-        }
         instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
         dadosMem = new Memoria_dados(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
         jButton3.setEnabled(true);
@@ -181,6 +192,11 @@ public class Frame extends JFrame {
         jDialog1.addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentHidden(java.awt.event.ComponentEvent evt) {
                 jDialog1ComponentHidden(evt);
+            }
+        });
+        jDialog1.addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                jDialog1WindowOpened(evt);
             }
         });
 
@@ -296,6 +312,11 @@ public class Frame extends JFrame {
 
         jLabel1.setFont(new java.awt.Font("URW Palladio L", 1, 18)); // NOI18N
         jLabel1.setText("Registradores");
+        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel1MouseClicked(evt);
+            }
+        });
 
         jList2.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -318,6 +339,11 @@ public class Frame extends JFrame {
 
         jLabel3.setFont(new java.awt.Font("URW Palladio L", 1, 16)); // NOI18N
         jLabel3.setText("   Cache Instruções: Via");
+        jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel3MouseClicked(evt);
+            }
+        });
 
         jButton1.setText("Rodar");
         jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -345,6 +371,11 @@ public class Frame extends JFrame {
 
         jLabel4.setFont(new java.awt.Font("URW Palladio L", 1, 16)); // NOI18N
         jLabel4.setText("   Cache Dados: Via");
+        jLabel4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel4MouseClicked(evt);
+            }
+        });
 
         jList1.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -361,6 +392,11 @@ public class Frame extends JFrame {
         jLabel2.setFont(new java.awt.Font("URW Palladio L", 1, 18)); // NOI18N
         jLabel2.setText(" Memória Principal");
         jLabel2.setToolTipText("");
+        jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel2MouseClicked(evt);
+            }
+        });
 
         jTextField2.setToolTipText("");
         jTextField2.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -545,6 +581,7 @@ public class Frame extends JFrame {
             if (jButton1.getText() == "Parar") {
                 PC.Contador = 0;
                 jButton3.setEnabled(true);
+                jList1.setEnabled(true);
                 jTextField1.setEnabled(true);
                 jTextField2.setEnabled(true);
                 jButton1.setText("Rodar");
@@ -727,6 +764,39 @@ public class Frame extends JFrame {
             System.exit(0);
         }
     }//GEN-LAST:event_jDialog1ComponentHidden
+
+    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
+        if (evt.getClickCount() == 3 && jButton1.getText() == "Rodar") {
+            inicializarMemoria();
+            inserirInterface();
+        }
+    }//GEN-LAST:event_jLabel2MouseClicked
+
+    private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
+        if (evt.getClickCount() == 2 && jButton1.getText() == "Rodar") {
+            inicializarRegistradores();
+            inserirInterface();
+        }
+    }//GEN-LAST:event_jLabel1MouseClicked
+
+    private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
+        if (evt.getClickCount() == 2 && jButton1.getText() == "Rodar") {
+            instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
+            inserirInterface();
+        }
+    }//GEN-LAST:event_jLabel3MouseClicked
+
+    private void jLabel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseClicked
+        if (evt.getClickCount() == 2 && jButton1.getText() == "Rodar") {
+            dadosMem = new Memoria_dados(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
+            inserirInterface();
+        }
+    }//GEN-LAST:event_jLabel4MouseClicked
+
+    private void jDialog1WindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_jDialog1WindowOpened
+        ImageIcon img = new ImageIcon("./src/Img/web_hi_res_512.png");
+        jDialog1.setIconImage(img.getImage());
+    }//GEN-LAST:event_jDialog1WindowOpened
 
     /**
      * @param args the command line arguments
