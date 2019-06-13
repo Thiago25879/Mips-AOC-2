@@ -88,7 +88,9 @@ public class Frame extends JFrame {
             jButton3.setEnabled(false);
             jTextField1.setEnabled(false);
             jTextField2.setEnabled(false);
+            jButton1.setText("Parar");
             this.instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
+            this.dadosMem = new Memoria_dados(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
         }
         while (PC.Contador < Mips_Multiciclo.tamPrincipal && Memoria_instrucoes.decode(Memoria_principal.memoria[PC.Contador]) == 0) {
             PC.Contador++;
@@ -174,6 +176,13 @@ public class Frame extends JFrame {
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
+
+        jDialog1.setAlwaysOnTop(true);
+        jDialog1.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentHidden(java.awt.event.ComponentEvent evt) {
+                jDialog1ComponentHidden(evt);
+            }
+        });
 
         jLabel7.setFont(new java.awt.Font("URW Palladio L", 1, 18)); // NOI18N
         jLabel7.setText("Configurações");
@@ -530,7 +539,19 @@ public class Frame extends JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
-        executar();
+        if (jButton1.getText() == "Rodar") {
+            executar();
+        } else {
+            if (jButton1.getText() == "Parar") {
+                PC.Contador = 0;
+                jButton3.setEnabled(true);
+                jTextField1.setEnabled(true);
+                jTextField2.setEnabled(true);
+                jButton1.setText("Rodar");
+                this.instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
+                this.dadosMem = new Memoria_dados(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
+            }
+        }
         inserirInterface();
     }//GEN-LAST:event_jButton1MouseClicked
 
@@ -700,6 +721,12 @@ public class Frame extends JFrame {
             }
         }
     }//GEN-LAST:event_jSpinner2StateChanged
+
+    private void jDialog1ComponentHidden(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jDialog1ComponentHidden
+        if (!this.isVisible()) {
+            System.exit(0);
+        }
+    }//GEN-LAST:event_jDialog1ComponentHidden
 
     /**
      * @param args the command line arguments
