@@ -1,6 +1,8 @@
 //Unidade de Controle
 package mips_multiciclo;
 
+import static java.lang.Math.pow;
+
 public class Unidade_de_Controle {
 
     /*private static int RegDst;
@@ -82,20 +84,31 @@ public class Unidade_de_Controle {
                     }
                     break;
                 case 3:
+                    int indice, via = 0;
                     funct = 0;
                     FonteA = Registradores.Registradores[(inst >> 21) & 0b11111];
                     FonteB = inst & 0b1111111111111111;
-                    if ((opcode & 0b101000) == 0b101000) {//If = SW    else = LW
-                        Memoria_dados.memoria[(ULA.Operacao(opcode, funct, FonteA, FonteB))/4] = Registradores.Registradores[(inst >> 16) & 0b11111];
-                    } else {
-                        Registradores.Registradores[(inst >> 16) & 0b11111] = Memoria_dados.memoria[(ULA.Operacao(opcode, funct, FonteA, FonteB))/4];
+                    indice = (FonteB >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1;
+                    via = Mips_Multiciclo.frame.dadosMem.buscarEnd((ULA.Operacao(opcode, funct, FonteA, FonteB)) / 4);
+                    if (via == -1) {
+                        via = Mips_Multiciclo.frame.dadosMem.setMemoria((ULA.Operacao(opcode, funct, FonteA, FonteB)) / 4);
                     }
-                    break;
+                    if ((opcode & 0b101000) == 0b101000) {//If = SW    else = LW
+                        Mips_Multiciclo.frame.dadosMem.Blocos[indice][via].Palavra[FonteB & 0b11] = Registradores.Registradores[(inst >> 16) & 0b11111];
+                    } else {
+                        Registradores.Registradores[(inst >> 16) & 0b11111] = Mips_Multiciclo.frame.dadosMem.Blocos[indice][via].Palavra[FonteB & 0b11];
+                    }
+                        Memoria_principal.setMemoriaDado(((ULA.Operacao(opcode, funct, FonteA, FonteB)) / 4), Mips_Multiciclo.frame.dadosMem.Blocos[indice][via].Palavra[0]);
+                        Memoria_principal.setMemoriaDado(((ULA.Operacao(opcode, funct, FonteA, FonteB)) / 4)+1, Mips_Multiciclo.frame.dadosMem.Blocos[indice][via].Palavra[1]);
+                        Memoria_principal.setMemoriaDado(((ULA.Operacao(opcode, funct, FonteA, FonteB)) / 4)+2, Mips_Multiciclo.frame.dadosMem.Blocos[indice][via].Palavra[2]);
+                        Memoria_principal.setMemoriaDado(((ULA.Operacao(opcode, funct, FonteA, FonteB)) / 4)+3, Mips_Multiciclo.frame.dadosMem.Blocos[indice][via].Palavra[3]);
+                        
+                        break;
                 case 4:
                     if (opcode == 0b11) {
-                        Registradores.Registradores[31] = (PC.Contador + 1)*4;
+                        Registradores.Registradores[31] = (PC.Contador + 1) * 4;
                     }
-                    PC.Contador = ((inst & 0b00000011111111111111111111111111) - 1)/4;
+                    PC.Contador = ((inst & 0b00000011111111111111111111111111) - 1) / 4;
                     break;
             }
 

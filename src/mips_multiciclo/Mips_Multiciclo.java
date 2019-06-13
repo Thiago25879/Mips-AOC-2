@@ -11,16 +11,13 @@ public class Mips_Multiciclo {
     static int vias = 1;
     static int indiceTam = 0;
     static int tamPrincipal = 1024;
-
+    static Frame frame;
+    
     public static void main(String[] args) {
-
+        Mips_Multiciclo main = new Mips_Multiciclo();
+        main.inicializar();
         
-        Frame frame = new Frame();
-        frame.inicializarMemoria();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1000, 616);
-        frame.mostrarConfig();
-        frame.setVisible(false);
+        
         /*
         int opt;
         String inst;
@@ -146,6 +143,13 @@ public class Mips_Multiciclo {
          */
     }
 
-    
+    public void inicializar(){
+        frame = new Frame();
+        frame.inicializarMemoria();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(1000, 616);
+        frame.mostrarConfig();
+        frame.setVisible(false);
+    }
 
 }

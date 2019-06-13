@@ -33,16 +33,16 @@ public class Memoria_instrucoes {
         return temp;
     }
 
-    public Bloco buscarEnd(int endereco) {
+    public int buscarEnd(int endereco) {
         int indice, tag;
         tag = endereco >> (2 + Mips_Multiciclo.indiceTam);
         indice = (endereco >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1;
         for (int bloco = 0; bloco < Mips_Multiciclo.vias; bloco++) {
             if (this.Blocos[indice][bloco].Tag == tag && this.Blocos[indice][bloco].Validade) {
-                return Blocos[indice][bloco];
+                return bloco;
             }
         }
-        return null;
+        return -1;
     }
 
     public int setMemoria(int endereco) {

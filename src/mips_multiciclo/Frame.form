@@ -563,6 +563,9 @@
           <Font name="sansserif" size="14" style="1"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jSpinner2StateChanged"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

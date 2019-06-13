@@ -28,6 +28,7 @@ public class Frame extends JFrame {
      * Creates new form Frame
      */
     public Memoria_instrucoes instrucMem;
+    public Memoria_dados dadosMem;
     int blocoMem;
 
     public Frame() {
@@ -47,9 +48,9 @@ public class Frame extends JFrame {
 
     public void atualizarCaches() {
         int blocoInst = Integer.parseInt(jSpinner1.getValue().toString());
-        //int blocoDados = Integer.parseInt(jLabel4.getText().split(" ")[6]);
+        int blocoDados = Integer.parseInt(jSpinner2.getValue().toString());
         jList3.setListData(this.instrucMem.tostring(blocoInst));
-        jList4.setListData(Memoria_dados.paraString());
+        jList4.setListData(this.dadosMem.tostring(blocoDados));
     }
 
     public void atualizarPC() {
@@ -69,8 +70,8 @@ public class Frame extends JFrame {
         this.instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
         for (PC.Contador = 0; PC.Contador < Mips_Multiciclo.tamPrincipal; PC.Contador++) {
             if (Memoria_instrucoes.decode(Memoria_principal.memoria[PC.Contador]) != 0) {
-                Bloco bloco = instrucMem.buscarEnd(PC.Contador);
-                if (bloco == null) {
+                via = instrucMem.buscarEnd(PC.Contador);
+                if (via == -1) {
                     via = instrucMem.setMemoria(PC.Contador);
                 }
                 Unidade_de_Controle.decodeULA(instrucMem.Blocos[(PC.Contador >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1][via].Palavra[PC.Contador & 0b11]);
@@ -95,8 +96,8 @@ public class Frame extends JFrame {
         if (PC.Contador == Mips_Multiciclo.tamPrincipal) {
             PC.Contador--;
         } else {
-            Bloco bloco = instrucMem.buscarEnd(PC.Contador);
-            if (bloco == null) {
+            via = instrucMem.buscarEnd(PC.Contador);
+            if (via == -1) {
                 via = instrucMem.setMemoria(PC.Contador);
             }
             Unidade_de_Controle.decodeULA(instrucMem.Blocos[(PC.Contador >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1][via].Palavra[PC.Contador & 0b11]);
@@ -121,10 +122,8 @@ public class Frame extends JFrame {
         for (int x = 0; x < Registradores.Registradores.length; x++) {
             Registradores.Registradores[x] = 0;
         }
-        for (int x = 0; x < Memoria_dados.memoria.length; x++) {
-            Memoria_dados.memoria[x] = 0;
-        }
         instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
+        dadosMem = new Memoria_dados(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
         jButton3.setEnabled(true);
         jTextField1.setEnabled(true);
         jTextField2.setEnabled(true);
@@ -394,6 +393,11 @@ public class Frame extends JFrame {
         });
 
         jSpinner2.setFont(new java.awt.Font("sansserif", 1, 14)); // NOI18N
+        jSpinner2.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSpinner2StateChanged(evt);
+            }
+        });
 
         jMenu1.setText("Opções");
 
@@ -624,6 +628,7 @@ public class Frame extends JFrame {
                 Mips_Multiciclo.indiceTam = (int) (Math.log(Integer.parseInt(jTextField4.getText())) / Math.log(2));
                 if (this.isVisible() == false) {
                     this.instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
+                    this.dadosMem = new Memoria_dados(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
                     inserirInterface();
                     this.setVisible(true);
                 }
@@ -679,6 +684,22 @@ public class Frame extends JFrame {
             }
         }
     }//GEN-LAST:event_jSpinner1StateChanged
+
+    private void jSpinner2StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner2StateChanged
+        try {
+            jSpinner2.commitEdit();
+        } catch (java.text.ParseException e) {
+        }
+        if ((Integer) jSpinner2.getValue() >= Mips_Multiciclo.vias) {
+            jSpinner2.setValue(Mips_Multiciclo.vias - 1);
+        } else {
+            if ((Integer) jSpinner2.getValue() < 0) {
+                jSpinner2.setValue(0);
+            } else {
+                atualizarCaches();
+            }
+        }
+    }//GEN-LAST:event_jSpinner2StateChanged
 
     /**
      * @param args the command line arguments

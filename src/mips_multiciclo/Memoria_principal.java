@@ -37,6 +37,16 @@ public class Memoria_principal {
         return false;
     }
 
+    public static boolean setMemoriaDado(int local, int dado) {
+        try {
+            Memoria_principal.memoria[local] = String.valueOf(dado);
+            return true;
+        } catch (ArrayIndexOutOfBoundsException e) {
+
+        }
+        return false;
+    }
+
     public static String toString(int x) {
         // You can change this to suite the presentation of a list item
         return x * 4 + ": " + memoria[x].toUpperCase();
