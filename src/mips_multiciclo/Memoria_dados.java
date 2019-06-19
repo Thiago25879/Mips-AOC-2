@@ -1,5 +1,4 @@
 //Memória de dados
-
 package mips_multiciclo;
 
 import static java.lang.Math.pow;
@@ -19,7 +18,7 @@ public class Memoria_dados {
     }
 
     public String toString(int indice, int bloco, int palavra) {
-        return "Ind. " + indice + ", Palav. " + palavra + " : " + Integer.toHexString(Blocos[indice][bloco].Palavra[palavra]).toUpperCase();
+        return "Ind. " + indice + ", Palav. " + palavra + " : " + Integer.toString(Blocos[indice][bloco].Palavra[palavra]).toUpperCase();
     }
 
     public String[] tostring(int bloco) {
@@ -62,10 +61,11 @@ public class Memoria_dados {
                 endereco -= 3;
                 break;
         }
-        bloco.Palavra[0] = Memoria_instrucoes.decode(Memoria_principal.memoria[endereco]);
-        bloco.Palavra[1] = Memoria_instrucoes.decode(Memoria_principal.memoria[endereco + 1]);
-        bloco.Palavra[2] = Memoria_instrucoes.decode(Memoria_principal.memoria[endereco + 2]);
-        bloco.Palavra[3] = Memoria_instrucoes.decode(Memoria_principal.memoria[endereco + 3]);
+        endereco += (Mips_Multiciclo.tamPrincipal / 2);
+        bloco.Palavra[0] = Integer.parseInt(Memoria_principal.memoria[endereco]);
+        bloco.Palavra[1] = Integer.parseInt(Memoria_principal.memoria[endereco + 1]);
+        bloco.Palavra[2] = Integer.parseInt(Memoria_principal.memoria[endereco + 2]);
+        bloco.Palavra[3] = Integer.parseInt(Memoria_principal.memoria[endereco + 3]);
         return via;
     }
 

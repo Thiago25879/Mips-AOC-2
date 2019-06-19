@@ -2,6 +2,7 @@
 package mips_multiciclo;
 
 import static java.lang.Math.pow;
+import java.util.ArrayList;
 
 public class Memoria_instrucoes {
 
@@ -17,11 +18,62 @@ public class Memoria_instrucoes {
         }
     }
 
+    public void setMemoriaInst(String dados) {
+        int S = 0;
+        ArrayList list = new ArrayList();
+        ArrayList list2 = new ArrayList();
+        ArrayList list3 = new ArrayList();
+        S = dados.replaceAll("[^0-9.|:\n]", "").split("[|.:]").length;
+        for (int x = 0; x < S; x++) {
+            if (!"".equals((dados.replaceAll("[^0-9.|:\n]", "").split("[|.:]")[x]).trim())) {
+                if (!"\n".equals((dados.replaceAll("[^0-9.|:\n]", "").split("[|.:]")[x]).trim())) {
+                    list.add(dados.replaceAll("[^0-9.|:\n]", "").split("[|.:]")[x].trim());
+                }
+            }
+        }
+
+        for (int x = 0; x < list.size(); x += (Mips_Multiciclo.tamCache * 12) + 1) {
+            list2.add(x);
+        }
+        for (int x = 0; x < list.size(); x++) {
+            if (!list2.contains(x)) {
+                list3.add(list.get(x));
+            }
+        }
+        list.clear();
+        for (int x = 2; x < list3.size(); x += 3) {
+            list.add(list3.get(x));
+        }
+        for (int via = 0; via < Mips_Multiciclo.vias; via++) {
+            for (int indice = 0; indice < Mips_Multiciclo.tamCache; indice++) {
+                for (int palavra = 0; palavra < 4; palavra++) {
+                    this.Blocos[indice][via].Palavra[palavra]=Integer.parseInt((String) list.get(0));
+                    list.remove(0);
+                }
+            }
+        }
+    }
+
     public String toString(int indice, int bloco, int palavra) {
         return "Ind. " + indice + ", Palav. " + palavra + " : " + Integer.toHexString(Blocos[indice][bloco].Palavra[palavra]).toUpperCase();
     }
 
+    public String toStringD(int indice, int bloco, int palavra) {
+        return "Ind. " + indice + ", Palav. " + palavra + " : " + Integer.toString(Blocos[indice][bloco].Palavra[palavra]).toUpperCase();
+    }
+
     public String[] tostring(int bloco) {
+        String temp[] = new String[Mips_Multiciclo.tamCache * 4];
+        for (int indice = 0; indice < Mips_Multiciclo.tamCache; indice++) {
+            for (int palavra = 0; palavra < 4; palavra++) {
+                temp[(indice * 4) + palavra] = new String();
+                temp[(indice * 4) + palavra] = toString(indice, bloco, palavra);
+            }
+        }
+        return temp;
+    }
+
+    public String[] tostringD(int bloco) {
         String temp[] = new String[Mips_Multiciclo.tamCache * 4];
         for (int indice = 0; indice < Mips_Multiciclo.tamCache; indice++) {
             for (int palavra = 0; palavra < 4; palavra++) {
@@ -195,6 +247,9 @@ public class Memoria_instrucoes {
                     break;
                 case 2:
                     instBit = instBit | Integer.parseInt(separado[1]);
+                    if (Integer.parseInt(separado[1]) >= (Mips_Multiciclo.tamPrincipal / 2) * 4) {
+                        throw new Exception("");
+                    }
                     break;
                 case 3:
                     reg1 = decodificarReg(separado[1]);
@@ -204,6 +259,9 @@ public class Memoria_instrucoes {
                     instBit = instBit | reg1;
                     instBit = instBit | reg2;
                     instBit = instBit | Integer.parseInt(separado[2]);
+                    if (Integer.parseInt(separado[2]) >= (Mips_Multiciclo.tamPrincipal / 2) * 4) {
+                        throw new Exception("");
+                    }
                     break;
                 case 4:
                     reg1 = decodificarReg(separado[1]);
@@ -267,10 +325,19 @@ public class Memoria_instrucoes {
                 return 31;
         }
         String temp2[] = temp.split("");
+        if (temp2.length > 2 || Integer.parseInt(temp2[1]) < 0) {
+            throw new Exception("");
+        }
         switch (temp2[0]) {
             case "v":
+                if (Integer.parseInt(temp2[1]) > 1) {
+                    throw new Exception("");
+                }
                 return (Integer.parseInt(temp2[1]) + 2);
             case "a":
+                if (Integer.parseInt(temp2[1]) > 3) {
+                    throw new Exception("");
+                }
                 return (Integer.parseInt(temp2[1]) + 4);
             case "t":
                 if (Integer.parseInt(temp2[1]) <= 7) {
@@ -283,10 +350,13 @@ public class Memoria_instrucoes {
                     }
                 }
             case "s":
+                if (Integer.parseInt(temp2[1]) > 7) {
+                    throw new Exception("");
+                }
                 return (Integer.parseInt(temp2[1]) + 16);
-
+            default:
+                throw new Exception("");
         }
-        throw new Exception("");
     }
 
 }
