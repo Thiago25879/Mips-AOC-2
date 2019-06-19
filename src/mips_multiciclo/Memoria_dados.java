@@ -2,6 +2,7 @@
 package mips_multiciclo;
 
 import static java.lang.Math.pow;
+import java.util.ArrayList;
 
 public class Memoria_dados {
 
@@ -30,6 +31,42 @@ public class Memoria_dados {
             }
         }
         return temp;
+    }
+    
+    public void setMemoriaDados(String dados) {
+        int S = 0;
+        ArrayList list = new ArrayList(); 
+        ArrayList list2 = new ArrayList();
+        ArrayList list3 = new ArrayList();
+        S = dados.replaceAll("[^0-9.|:\n]", "").split("[|.:]").length;
+        for (int x = 0; x < S; x++) {
+            if (!"".equals((dados.replaceAll("[^0-9.|:\n]", "").split("[|.:]")[x]).trim())) {
+                if (!"\n".equals((dados.replaceAll("[^0-9.|:\n]", "").split("[|.:]")[x]).trim())) {
+                    list.add(dados.replaceAll("[^0-9.|:\n]", "").split("[|.:]")[x].trim());
+                }
+            }
+        }
+
+        for (int x = 0; x < list.size(); x += (Mips_Multiciclo.tamCache * 12) + 1) {
+            list2.add(x);
+        }
+        for (int x = 0; x < list.size(); x++) {
+            if (!list2.contains(x)) {
+                list3.add(list.get(x));
+            }
+        }
+        list.clear();
+        for (int x = 2; x < list3.size(); x += 3) {
+            list.add(list3.get(x));
+        }
+        for (int via = 0; via < Mips_Multiciclo.vias; via++) {
+            for (int indice = 0; indice < Mips_Multiciclo.tamCache; indice++) {
+                for (int palavra = 0; palavra < 4; palavra++) {
+                    this.Blocos[indice][via].Palavra[palavra]=Integer.parseInt((String) list.get(0));
+                    list.remove(0);
+                }
+            }
+        }
     }
 
     public int buscarEnd(int endereco) {

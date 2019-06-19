@@ -244,21 +244,27 @@ public class Frame extends JFrame {
         dados[x] = informacoes.substring(inicio);
         /*--------------------------------------------------------*/
         //try {
-            interno = new String[5];
-            dados[0] = dados[0].replaceAll("[^0-9:-]", "");
-            interno = dados[0].split(":");
-            Mips_Multiciclo.vias = Integer.parseInt(interno[2]);
-            Mips_Multiciclo.tamCache = Integer.parseInt(interno[1]);
-            Mips_Multiciclo.indiceTam = Integer.parseInt(interno[2]);
-            Mips_Multiciclo.tamPrincipal = Integer.parseInt(interno[4]);
-            
-            this.instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
-            this.dadosMem = new Memoria_dados(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
-            
-            Registradores.setRegs(dados[1]);
-            instrucMem.setMemoriaInst(dados[2]);
-            
-            inserirInterface();
+        interno = new String[5];
+        dados[0] = dados[0].replaceAll("[^0-9:-]", "");
+        interno = dados[0].split(":");
+        Mips_Multiciclo.vias = Integer.parseInt(interno[2]);
+        Mips_Multiciclo.tamCache = Integer.parseInt(interno[1]);
+        Mips_Multiciclo.indiceTam = Integer.parseInt(interno[2]);
+        Mips_Multiciclo.tamPrincipal = Integer.parseInt(interno[4]);
+
+        this.instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
+        this.dadosMem = new Memoria_dados(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
+
+        Registradores.setRegs(dados[1]);
+        instrucMem.setMemoriaInst(dados[2]);
+        dadosMem.setMemoriaDados(dados[3]);
+        
+        String novo;
+        novo = dados[4].replaceAll("(?<=\n)(.*)(?=: )[:]", "").trim();
+        novo = novo.substring(20);
+        Memoria_principal.setMemoriaMult(0, novo);
+
+        inserirInterface();
         //} catch (Exception e) {
 
         //}

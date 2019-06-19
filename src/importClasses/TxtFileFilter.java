@@ -24,6 +24,7 @@ public class TxtFileFilter extends javax.swing.filechooser.FileFilter {
         for (String extension : okFileExtensions) {
             if (file.getName().toLowerCase().endsWith(extension)) {
                 try {
+                    System.out.println("txt");
                     FileReader reader = new FileReader(file);
                     String test = "|Informações|";
                     int i, cont = 0;
@@ -35,6 +36,7 @@ public class TxtFileFilter extends javax.swing.filechooser.FileFilter {
                         }
                         cont++;
                     }
+                    return true;
                 } catch (FileNotFoundException ex) {
                     System.out.println("FNFE");
                 } catch (IOException ex) {

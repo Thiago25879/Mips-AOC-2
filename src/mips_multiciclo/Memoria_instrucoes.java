@@ -78,7 +78,7 @@ public class Memoria_instrucoes {
         for (int indice = 0; indice < Mips_Multiciclo.tamCache; indice++) {
             for (int palavra = 0; palavra < 4; palavra++) {
                 temp[(indice * 4) + palavra] = new String();
-                temp[(indice * 4) + palavra] = toString(indice, bloco, palavra);
+                temp[(indice * 4) + palavra] = toStringD(indice, bloco, palavra);
             }
         }
         return temp;
