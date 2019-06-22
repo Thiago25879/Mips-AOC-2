@@ -24,7 +24,6 @@ public class TxtFileFilter extends javax.swing.filechooser.FileFilter {
         for (String extension : okFileExtensions) {
             if (file.getName().toLowerCase().endsWith(extension)) {
                 try {
-                    System.out.println("txt");
                     FileReader reader = new FileReader(file);
                     String test = "|Informações|";
                     int i, cont = 0;

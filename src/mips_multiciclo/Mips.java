@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
-public class Mips_Multiciclo {
+public class Mips {
     
     static int tamCache = 1;
     static int vias = 1;
@@ -19,7 +19,7 @@ public class Mips_Multiciclo {
     static Frame frame;
     
     public static void main(String[] args) {
-        Mips_Multiciclo main = new Mips_Multiciclo();
+        Mips main = new Mips();
         main.inicializar();
     }
     

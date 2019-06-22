@@ -4,11 +4,11 @@ package mips_multiciclo;
 import static java.lang.Math.pow;
 import java.util.ArrayList;
 
-public class Memoria_instrucoes {
+public class CacheInstrucoes {
 
     public Bloco[][] Blocos;
 
-    public Memoria_instrucoes(int numIndices, int numVias) {
+    public CacheInstrucoes(int numIndices, int numVias) {
         this.Blocos = new Bloco[numIndices][numVias];
         for (int x = 0; x < numIndices; x++) {
             for (int y = 0; y < numVias; y++) {
@@ -32,7 +32,7 @@ public class Memoria_instrucoes {
             }
         }
 
-        for (int x = 0; x < list.size(); x += (Mips_Multiciclo.tamCache * 12) + 1) {
+        for (int x = 0; x < list.size(); x += (Mips.tamCache * 12) + 1) {
             list2.add(x);
         }
         for (int x = 0; x < list.size(); x++) {
@@ -44,10 +44,10 @@ public class Memoria_instrucoes {
         for (int x = 2; x < list3.size(); x += 3) {
             list.add(list3.get(x));
         }
-        for (int via = 0; via < Mips_Multiciclo.vias; via++) {
-            for (int indice = 0; indice < Mips_Multiciclo.tamCache; indice++) {
+        for (int via = 0; via < Mips.vias; via++) {
+            for (int indice = 0; indice < Mips.tamCache; indice++) {
                 for (int palavra = 0; palavra < 4; palavra++) {
-                    this.Blocos[indice][via].Palavra[palavra]=Integer.parseInt((String) list.get(0));
+                    this.Blocos[indice][via].Palavra[palavra] = Integer.parseInt((String) list.get(0));
                     list.remove(0);
                 }
             }
@@ -63,8 +63,8 @@ public class Memoria_instrucoes {
     }
 
     public String[] tostring(int bloco) {
-        String temp[] = new String[Mips_Multiciclo.tamCache * 4];
-        for (int indice = 0; indice < Mips_Multiciclo.tamCache; indice++) {
+        String temp[] = new String[Mips.tamCache * 4];
+        for (int indice = 0; indice < Mips.tamCache; indice++) {
             for (int palavra = 0; palavra < 4; palavra++) {
                 temp[(indice * 4) + palavra] = new String();
                 temp[(indice * 4) + palavra] = toString(indice, bloco, palavra);
@@ -74,8 +74,8 @@ public class Memoria_instrucoes {
     }
 
     public String[] tostringD(int bloco) {
-        String temp[] = new String[Mips_Multiciclo.tamCache * 4];
-        for (int indice = 0; indice < Mips_Multiciclo.tamCache; indice++) {
+        String temp[] = new String[Mips.tamCache * 4];
+        for (int indice = 0; indice < Mips.tamCache; indice++) {
             for (int palavra = 0; palavra < 4; palavra++) {
                 temp[(indice * 4) + palavra] = new String();
                 temp[(indice * 4) + palavra] = toStringD(indice, bloco, palavra);
@@ -86,9 +86,10 @@ public class Memoria_instrucoes {
 
     public int buscarEnd(int endereco) {
         int indice, tag;
-        tag = endereco >> (2 + Mips_Multiciclo.indiceTam);
-        indice = (endereco >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1;
-        for (int bloco = 0; bloco < Mips_Multiciclo.vias; bloco++) {
+        tag = endereco >> (2 + Mips.indiceTam);
+        indice = (endereco >> 2) & ((int) (pow(2, Mips.indiceTam))) - 1;
+
+        for (int bloco = 0; bloco < Mips.vias; bloco++) {
             if (this.Blocos[indice][bloco].Tag == tag && this.Blocos[indice][bloco].Validade) {
                 return bloco;
             }
@@ -99,9 +100,9 @@ public class Memoria_instrucoes {
     public int setMemoria(int endereco) {
 
         int via = encontrarBloco(endereco);
-        Bloco bloco = this.Blocos[(endereco >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1][via];
+        Bloco bloco = this.Blocos[(endereco >> 2) & ((int) (pow(2, Mips.indiceTam))) - 1][via];
         bloco.Validade = true;
-        bloco.Tag = endereco >> (2 + Mips_Multiciclo.indiceTam);
+        bloco.Tag = endereco >> (2 + Mips.indiceTam);
         switch (endereco & 0b11) {
             case 1:
                 endereco -= 1;
@@ -113,20 +114,20 @@ public class Memoria_instrucoes {
                 endereco -= 3;
                 break;
         }
-        bloco.Palavra[0] = Memoria_instrucoes.decode(Memoria_principal.memoria[endereco]);
-        bloco.Palavra[1] = Memoria_instrucoes.decode(Memoria_principal.memoria[endereco + 1]);
-        bloco.Palavra[2] = Memoria_instrucoes.decode(Memoria_principal.memoria[endereco + 2]);
-        bloco.Palavra[3] = Memoria_instrucoes.decode(Memoria_principal.memoria[endereco + 3]);
+        bloco.Palavra[0] = CacheInstrucoes.decode(MemoriaPrincipal.memoria[endereco]);
+        bloco.Palavra[1] = CacheInstrucoes.decode(MemoriaPrincipal.memoria[endereco + 1]);
+        bloco.Palavra[2] = CacheInstrucoes.decode(MemoriaPrincipal.memoria[endereco + 2]);
+        bloco.Palavra[3] = CacheInstrucoes.decode(MemoriaPrincipal.memoria[endereco + 3]);
         return via;
     }
 
     public int encontrarBloco(int endereco) {
-        if (Mips_Multiciclo.vias != 1) {
-            int indice = (endereco >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1;
+        if (Mips.vias != 1) {
+            int indice = (endereco >> 2) & ((int) (pow(2, Mips.indiceTam))) - 1;
             int bloco = 0;
-            for (int x = 0; x < Mips_Multiciclo.vias; x++) {
+            for (int x = 0; x < Mips.vias; x++) {
                 if (this.Blocos[indice][x].LRU == 1) {
-                    this.Blocos[indice][x].LRU = Mips_Multiciclo.vias + 1;
+                    this.Blocos[indice][x].LRU = Mips.vias + 1;
                     bloco = x;
                 }
                 this.Blocos[indice][x].LRU--;
@@ -247,7 +248,7 @@ public class Memoria_instrucoes {
                     break;
                 case 2:
                     instBit = instBit | Integer.parseInt(separado[1]);
-                    if (Integer.parseInt(separado[1]) >= (Mips_Multiciclo.tamPrincipal / 2) * 4) {
+                    if (Integer.parseInt(separado[1]) >= (Mips.tamPrincipal / 2) * 4) {
                         throw new Exception("");
                     }
                     break;
@@ -259,7 +260,7 @@ public class Memoria_instrucoes {
                     instBit = instBit | reg1;
                     instBit = instBit | reg2;
                     instBit = instBit | Integer.parseInt(separado[2]);
-                    if (Integer.parseInt(separado[2]) >= (Mips_Multiciclo.tamPrincipal / 2) * 4) {
+                    if (Integer.parseInt(separado[2]) >= (Mips.tamPrincipal / 2) * 4) {
                         throw new Exception("");
                     }
                     break;

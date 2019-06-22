@@ -1,17 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mips_multiciclo;
 
+import com.sun.glass.ui.Cursor;
 import importClasses.TxtFileFilter;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
-import static java.awt.event.KeyEvent.VK_ENTER;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
@@ -21,17 +14,7 @@ import java.io.IOException;
 import static java.lang.Math.pow;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
-import static mips_multiciclo.Mips_Multiciclo.tamCache;
+import static mips_multiciclo.Mips.tamCache;
 
 /**
  *
@@ -39,15 +22,13 @@ import static mips_multiciclo.Mips_Multiciclo.tamCache;
  */
 public class Frame extends JFrame {
 
-    /**
-     * Creates new form Frame
-     */
     final JFileChooser fc = new JFileChooser();
     File file;
     String dadoArq;
-    public Memoria_instrucoes instrucMem;
-    public Memoria_dados dadosMem;
+    public CacheInstrucoes instrucMem;
+    public CacheDados dadosMem;
     int blocoMem;
+    float falhaDados, falhaInst, acertoDados, acertoInst;
 
     public Frame() {
         super("Simulador MIPS");
@@ -64,15 +45,15 @@ public class Frame extends JFrame {
 
     public void inserirInterface() {
         if (jLabel2.getText() == " Memória Principal") {
-            jList1.setListData(Memoria_principal.paraString(0));
+            jList1.setListData(MemoriaPrincipal.paraString(0));
         }
         if (jLabel2.getText() == "Memória Principal I") {
-            jList1.setListData(Memoria_principal.paraString(1));
+            jList1.setListData(MemoriaPrincipal.paraString(1));
         }
         if (jLabel2.getText() == "Memória Principal D") {
-            jList1.setListData(Memoria_principal.paraString(2));
+            jList1.setListData(MemoriaPrincipal.paraString(2));
         }
-        jList2.setListData(Registradores.tostring());
+        jList2.setListData(BancoRegs.tostring());
         atualizarCaches();
         atualizarPC();
     }
@@ -89,56 +70,107 @@ public class Frame extends JFrame {
     }
 
     public void mostrarConfig() {
-        jTextField3.setText(String.valueOf(Mips_Multiciclo.vias));
-        jTextField4.setText(String.valueOf(Mips_Multiciclo.tamCache));
+        jTextField3.setText(String.valueOf(Mips.vias));
+        jTextField4.setText(String.valueOf(Mips.tamCache));
         jLabel10.setVisible(false);
         jDialog1.setVisible(true);
     }
 
     public void executar() {
-        int via = 0;
-        PC.Contador = 0;
-        this.instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
-        for (PC.Contador = 0; PC.Contador < Mips_Multiciclo.tamPrincipal / 2; PC.Contador++) {
-            if (Memoria_instrucoes.decode(Memoria_principal.memoria[PC.Contador]) != 0) {
-                via = instrucMem.buscarEnd(PC.Contador);
-                if (via == -1) {
-                    via = instrucMem.setMemoria(PC.Contador);
+        if (!"Desbloquear".equals(jButton1.getText())) {
+            int via = 0;
+            PC.Contador = 0;
+            this.falhaDados = 0;
+            this.falhaInst = 0;
+            this.acertoDados = 0;
+            this.acertoInst = 0;
+            jTextArea1.setFocusable(false);
+            jTextArea1.setEditable(false);
+            jTextField1.setEnabled(false);
+            jTextField2.setEnabled(false);
+            jTextArea1.setText("                    Iniciando Execução passo a passo\n");
+            this.instrucMem = new CacheInstrucoes(Mips.tamCache, Mips.vias);
+            for (PC.Contador = 0; PC.Contador < Mips.tamPrincipal / 2; PC.Contador++) {
+                if (CacheInstrucoes.decode(MemoriaPrincipal.memoria[PC.Contador]) != 0) {
+                    via = instrucMem.buscarEnd(PC.Contador);
+                    if (via == -1) {
+                        this.falhaInst++;
+                        this.acertoInst++;
+                        via = instrucMem.setMemoria(PC.Contador);
+                        jTextArea1.append("Instrução " + (PC.Contador * 4) + " não encontrada na cache, inserindo na cache " + via + ".\n");
+
+                    } else {
+                        this.acertoInst++;
+                    }
+                    UnidadeDeControle.decodeULA(instrucMem.Blocos[(PC.Contador >> 2) & ((int) (pow(2, Mips.indiceTam))) - 1][via].Palavra[PC.Contador & 0b11]);
                 }
-                Unidade_de_Controle.decodeULA(instrucMem.Blocos[(PC.Contador >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1][via].Palavra[PC.Contador & 0b11]);
             }
+            if (acertoInst != 0) {
+                float resultado = ((falhaInst / acertoInst) * 100);
+                jTextArea1.append("Execução terminada\n Porcentagem de falhas de instrução:" + resultado + "%.");
+                resultado = ((falhaDados / acertoDados) * 100);
+                jTextArea1.append("\n Porcentagem de falhas de dados:" + resultado + "%.");
+            }
+            PC.Contador--;
+            jButton1.setText("Desbloquear");
+            jButton3.setText("Salvar Log");
+        } else {
+            jButton1.setText("Rodar");
+            jButton3.setText("Inserir Instruções");
+            jTextArea1.setFocusable(true);
+            jTextArea1.setEditable(true);
+            jTextField1.setEnabled(true);
+            jTextField2.setEnabled(true);
+            jTextArea1.setText("");
         }
-        PC.Contador--;
         inserirInterface();
     }
 
     public void passo_a_passo() {
-        int via = 0;
-        if (jButton3.isEnabled()) {
+        int via;
+        if ("Passo a Passo".equals(jButton2.getText())) {
+            jButton2.setText("Próximo Passo");
+            jTextArea1.setFocusable(false);
+            jTextArea1.setEditable(false);
+            jTextArea1.setText("                    Iniciando Execução passo a passo\n");
+            this.falhaDados = 0;
+            this.falhaInst = 0;
+            this.acertoDados = 0;
+            this.acertoInst = 0;
             PC.Contador = 0;
             jLabel2.setText(" Memória Principal");
             jList1.setEnabled(false);
-            jButton3.setEnabled(false);
             jTextField1.setEnabled(false);
             jTextField2.setEnabled(false);
             jButton1.setText("Parar");
-            this.instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
-            this.dadosMem = new Memoria_dados(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
+            jButton3.setText("Salvar Log");
+            this.instrucMem = new CacheInstrucoes(Mips.tamCache, Mips.vias);
+            this.dadosMem = new CacheDados(Mips.tamCache, Mips.vias);
         } else {
-            while (PC.Contador < Mips_Multiciclo.tamPrincipal / 2 && Memoria_instrucoes.decode(Memoria_principal.memoria[PC.Contador]) == 0) {
+            while (PC.Contador < Mips.tamPrincipal / 2 && CacheInstrucoes.decode(MemoriaPrincipal.memoria[PC.Contador]) == 0) {
                 PC.Contador++;
             }
-            if (PC.Contador == Mips_Multiciclo.tamPrincipal / 2) {
+            if (PC.Contador == Mips.tamPrincipal / 2) {
                 PC.Contador--;
             } else {
                 via = instrucMem.buscarEnd(PC.Contador);
                 if (via == -1) {
+                    this.falhaInst++;
+                    jTextArea1.append("Instrução " + (PC.Contador * 4) + " não encontrada na cache\n");
                     via = instrucMem.setMemoria(PC.Contador);
+                } else {
+                    this.acertoInst++;
                 }
-                Unidade_de_Controle.decodeULA(instrucMem.Blocos[(PC.Contador >> 2) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1][via].Palavra[PC.Contador & 0b11]);
-            }
-            if (PC.Contador == Mips_Multiciclo.tamPrincipal / 2 - 1) {
+                UnidadeDeControle.decodeULA(instrucMem.Blocos[(PC.Contador >> 2) & ((int) (pow(2, Mips.indiceTam))) - 1][via].Palavra[PC.Contador & 0b11]);
 
+            }
+            if (PC.Contador == Mips.tamPrincipal / 2 - 1) {
+                if (acertoInst != 0) {
+                    float resultado = ((falhaInst / acertoInst) * 100);
+                    jTextArea1.append("Execução terminada\n Porcentagem de falhas de instrução:" + resultado + "%.");
+                    resultado = ((falhaDados / acertoDados) * 100);
+                    jTextArea1.append("\n Porcentagem de falhas de dados:" + resultado + "%.");
+                }
             } else {
                 PC.Contador++;
             }
@@ -148,17 +180,17 @@ public class Frame extends JFrame {
     }
 
     public void inicializarMemoria() {
-        for (int x = 0; x < Mips_Multiciclo.tamPrincipal / 2; x++) {
-            Memoria_principal.memoria[x] = "";
+        for (int x = 0; x < Mips.tamPrincipal / 2; x++) {
+            MemoriaPrincipal.memoria[x] = "";
         }
-        for (int x = Mips_Multiciclo.tamPrincipal / 2; x < Mips_Multiciclo.tamPrincipal; x++) {
-            Memoria_principal.memoria[x] = "0";
+        for (int x = Mips.tamPrincipal / 2; x < Mips.tamPrincipal; x++) {
+            MemoriaPrincipal.memoria[x] = "0";
         }
     }
 
     public void inicializarRegistradores() {
-        for (int x = 0; x < Registradores.Registradores.length; x++) {
-            Registradores.Registradores[x] = 0;
+        for (int x = 0; x < BancoRegs.Registradores.length; x++) {
+            BancoRegs.Registradores[x] = 0;
         }
     }
 
@@ -166,9 +198,8 @@ public class Frame extends JFrame {
         inicializarMemoria();
         inicializarRegistradores();
         PC.Contador = 0;
-        instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
-        dadosMem = new Memoria_dados(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
-        jButton3.setEnabled(true);
+        instrucMem = new CacheInstrucoes(Mips.tamCache, Mips.vias);
+        dadosMem = new CacheDados(Mips.tamCache, Mips.vias);
         jTextField1.setEnabled(true);
         jTextField2.setEnabled(true);
     }
@@ -181,20 +212,20 @@ public class Frame extends JFrame {
             String lista[];
             String dados = new String();
             String insere = new String();
-            insere = insere = "|Informações|\n Tamanho_da_Cache:" + Mips_Multiciclo.tamCache + "\n Número_de_vias:" + Mips_Multiciclo.vias + "\n Tamanho_do_Indice:" + Mips_Multiciclo.indiceTam + "\n Tamanho_da_memoria_principal:" + Mips_Multiciclo.tamPrincipal + "\n";
+            insere = insere = "|Informações|\n Tamanho_da_Cache:" + Mips.tamCache + "\n Número_de_vias:" + Mips.vias + "\n Tamanho_do_Indice:" + Mips.indiceTam + "\n Tamanho_da_memoria_principal:" + Mips.tamPrincipal + "\n";
             dados = dados.concat(insere);
             insere = insere = "\n|Registradores|\n  ";
             lista = new String[32];
-            lista = Registradores.tostring();
+            lista = BancoRegs.tostring();
             for (int x = 0; x < 32; x++) {
                 insere = insere.concat(lista[x] + "\n  ");
             }
             dados = dados.concat(insere);
             insere = insere = "\n|Cache_instruções|";
             lista = new String[tamCache];
-            for (int y = 0; y < Mips_Multiciclo.vias; y++) {
+            for (int y = 0; y < Mips.vias; y++) {
                 insere = insere.concat("\n |Cache " + y + ":\n  ");
-                lista = Mips_Multiciclo.frame.instrucMem.tostringD(y);
+                lista = Mips.frame.instrucMem.tostringD(y);
                 for (int x = 0; x < tamCache * 4; x++) {
                     insere = insere.concat(lista[x] + "\n  ");
                 }
@@ -202,17 +233,17 @@ public class Frame extends JFrame {
             dados = dados.concat(insere);
             insere = "\n|Cache_dados|";
             lista = new String[tamCache];
-            for (int y = 0; y < Mips_Multiciclo.vias; y++) {
+            for (int y = 0; y < Mips.vias; y++) {
                 insere = insere.concat("\n |Cache " + y + ":\n  ");
-                lista = Mips_Multiciclo.frame.dadosMem.tostring(y);
+                lista = Mips.frame.dadosMem.tostring(y);
                 for (int x = 0; x < tamCache * 4; x++) {
                     insere = insere.concat(lista[x] + "\n  ");
                 }
             }
             dados = dados.concat(insere);
             insere = "\n|Memória_Principal|\n  ";
-            lista = new String[Mips_Multiciclo.tamPrincipal];
-            lista = Memoria_principal.paraString(0);
+            lista = new String[Mips.tamPrincipal];
+            lista = MemoriaPrincipal.paraString(0);
             for (int x = 0; x < 2048; x++) {
                 insere = insere.concat(lista[x] + "\n  ");
             }
@@ -247,22 +278,30 @@ public class Frame extends JFrame {
         interno = new String[5];
         dados[0] = dados[0].replaceAll("[^0-9:-]", "");
         interno = dados[0].split(":");
-        Mips_Multiciclo.vias = Integer.parseInt(interno[2]);
-        Mips_Multiciclo.tamCache = Integer.parseInt(interno[1]);
-        Mips_Multiciclo.indiceTam = Integer.parseInt(interno[2]);
-        Mips_Multiciclo.tamPrincipal = Integer.parseInt(interno[4]);
+        Mips.vias = Integer.parseInt(interno[2]);
+        Mips.tamCache = Integer.parseInt(interno[1]);
+        Mips.indiceTam = Integer.parseInt(interno[3]);
+        Mips.tamPrincipal = Integer.parseInt(interno[4]);
 
-        this.instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
-        this.dadosMem = new Memoria_dados(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
+        this.instrucMem = new CacheInstrucoes(Mips.tamCache, Mips.vias);
+        this.dadosMem = new CacheDados(Mips.tamCache, Mips.vias);
 
-        Registradores.setRegs(dados[1]);
+        BancoRegs.setRegs(dados[1]);
         instrucMem.setMemoriaInst(dados[2]);
         dadosMem.setMemoriaDados(dados[3]);
-        
+
         String novo;
         novo = dados[4].replaceAll("(?<=\n)(.*)(?=: )[:]", "").trim();
         novo = novo.substring(20);
-        Memoria_principal.setMemoriaMult(0, novo);
+        String[] sep = novo.split("\n");
+
+        for (int i = 0; i < sep.length; i++) {
+            if (i < Mips.tamPrincipal / 2) {
+                MemoriaPrincipal.setMemoria(true, i, sep[i].trim());
+            } else {
+                MemoriaPrincipal.setMemoria(false, i, sep[i].trim());
+            }
+        }
 
         inserirInterface();
         //} catch (Exception e) {
@@ -286,6 +325,23 @@ public class Frame extends JFrame {
                 }
                 inserirEstado(dadoArq);
             }
+        }
+    }
+
+    public void inserirTexto(String texto) {
+        jTextArea1.append(texto);
+    }
+    
+    public void salvarDados(){
+        fc.setFileSelectionMode(JFileChooser.SAVE_DIALOG);
+        int returnVal = fc.showSaveDialog(null);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            String dados = jTextArea1.getText();
+            file = fc.getSelectedFile();
+            jDialog2.setVisible(true);
+            jDialog2.setAlwaysOnTop(true);
+            jTextField5.requestFocusInWindow();
+            dadoArq = dados;
         }
     }
 
@@ -778,31 +834,40 @@ public class Frame extends JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
-        if (jButton1.getText() == "Rodar") {
+        if (jButton1.getText() == "Rodar" || jButton1.getText() == "Desbloquear") {
             executar();
         } else {
             if (jButton1.getText() == "Parar") {
                 PC.Contador = 0;
-                jButton3.setEnabled(true);
                 jList1.setEnabled(true);
                 jTextField1.setEnabled(true);
                 jTextField2.setEnabled(true);
+                jTextArea1.setEditable(true);
+                jTextArea1.setFocusable(true);
+                jTextArea1.setText("");
                 jButton1.setText("Rodar");
-                this.instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
-                this.dadosMem = new Memoria_dados(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
+                jButton2.setText("Passo a Passo");
+                
+            jButton3.setText("Inserir Instruções");
+                this.instrucMem = new CacheInstrucoes(Mips.tamCache, Mips.vias);
+                this.dadosMem = new CacheDados(Mips.tamCache, Mips.vias);
             }
         }
         inserirInterface();
     }//GEN-LAST:event_jButton1MouseClicked
 
     private void jButton3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton3MouseClicked
-        if (!"Memória Principal D".equals(jLabel2.getText()) && PC.Contador < (Mips_Multiciclo.tamPrincipal / 2)) {
+        if (!"Memória Principal D".equals(jLabel2.getText()) && PC.Contador < (Mips.tamPrincipal / 2) && jButton3.getText() == "Inserir Instruções") {
             int instNum = jTextArea1.getText().split("\n").length;
-            jTextArea1.setText(Memoria_principal.setMemoriaMult(PC.Contador, jTextArea1.getText()));
+            jTextArea1.setText(MemoriaPrincipal.setMemoriaMult(PC.Contador, jTextArea1.getText()));
             if ("".equals(jTextArea1.getText())) {
                 PC.Contador += instNum;
             }
             inserirInterface();
+        }else{
+            if(jButton3.getText() == "Salvar Log"){
+                this.salvarDados();
+            }
         }
     }//GEN-LAST:event_jButton3MouseClicked
 
@@ -826,26 +891,26 @@ public class Frame extends JFrame {
         boolean isInst = true;
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             if ("".equals(jTextField2.getText())) {
-                if ("Memória Principal D".equals(jLabel2.getText()) || (PC.Contador > (Mips_Multiciclo.tamPrincipal / 2))) {
-                    Memoria_principal.memoria[PC.Contador] = "0";
+                if ("Memória Principal D".equals(jLabel2.getText()) || (PC.Contador > (Mips.tamPrincipal / 2))) {
+                    MemoriaPrincipal.memoria[PC.Contador] = "0";
                     jTextField2.setText("0");
                 } else {
-                    Memoria_principal.memoria[PC.Contador] = "";
+                    MemoriaPrincipal.memoria[PC.Contador] = "";
                     jTextField2.setText("");
                 }
                 PC.Contador++;
                 inserirInterface();
             }
             if ("0".equals(jTextField2.getText())) {
-                Memoria_principal.memoria[PC.Contador + (Mips_Multiciclo.tamPrincipal / 2)] = "";
+                MemoriaPrincipal.memoria[PC.Contador + (Mips.tamPrincipal / 2)] = "";
                 jTextField2.setText("0");
                 PC.Contador++;
                 inserirInterface();
             }
-            if ("Memória Principal D".equals(jLabel2.getText()) || PC.Contador > (Mips_Multiciclo.tamPrincipal / 2)) {
+            if ("Memória Principal D".equals(jLabel2.getText()) || PC.Contador > (Mips.tamPrincipal / 2)) {
                 isInst = false;
             }
-            if (Memoria_principal.setMemoria(isInst, PC.Contador, jTextField2.getText())) {
+            if (MemoriaPrincipal.setMemoria(isInst, PC.Contador, jTextField2.getText())) {
                 jTextField2.setText("");
                 PC.Contador++;
                 inserirInterface();
@@ -874,7 +939,7 @@ public class Frame extends JFrame {
                     return;
                 default:
                     try {
-                        Registradores.Registradores[jList2.getSelectedIndex()] = Integer.parseInt(jTextField1.getText());
+                        BancoRegs.Registradores[jList2.getSelectedIndex()] = Integer.parseInt(jTextField1.getText());
                         jTextField1.setText("");
                         inserirInterface();
 
@@ -901,12 +966,12 @@ public class Frame extends JFrame {
             if ("".equals(jTextField3.getText()) || "".equals(jTextField4.getText()) || Integer.parseInt(jTextField3.getText()) < 1 || ((Math.log(Integer.parseInt(jTextField4.getText())) / Math.log(2))) % 1 != 0) {
                 jLabel10.setVisible(true);
             } else {
-                Mips_Multiciclo.vias = Integer.parseInt(jTextField3.getText());
-                Mips_Multiciclo.tamCache = Integer.parseInt(jTextField4.getText());
-                Mips_Multiciclo.indiceTam = (int) (Math.log(Integer.parseInt(jTextField4.getText())) / Math.log(2));
+                Mips.vias = Integer.parseInt(jTextField3.getText());
+                Mips.tamCache = Integer.parseInt(jTextField4.getText());
+                Mips.indiceTam = (int) (Math.log(Integer.parseInt(jTextField4.getText())) / Math.log(2));
                 if (this.isVisible() == false) {
-                    this.instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
-                    this.dadosMem = new Memoria_dados(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
+                    this.instrucMem = new CacheInstrucoes(Mips.tamCache, Mips.vias);
+                    this.dadosMem = new CacheDados(Mips.tamCache, Mips.vias);
                     inserirInterface();
                     this.setVisible(true);
                 }
@@ -952,8 +1017,8 @@ public class Frame extends JFrame {
             jSpinner1.commitEdit();
         } catch (java.text.ParseException e) {
         }
-        if ((Integer) jSpinner1.getValue() >= Mips_Multiciclo.vias) {
-            jSpinner1.setValue(Mips_Multiciclo.vias - 1);
+        if ((Integer) jSpinner1.getValue() >= Mips.vias) {
+            jSpinner1.setValue(Mips.vias - 1);
         } else {
             if ((Integer) jSpinner1.getValue() < 0) {
                 jSpinner1.setValue(0);
@@ -968,8 +1033,8 @@ public class Frame extends JFrame {
             jSpinner2.commitEdit();
         } catch (java.text.ParseException e) {
         }
-        if ((Integer) jSpinner2.getValue() >= Mips_Multiciclo.vias) {
-            jSpinner2.setValue(Mips_Multiciclo.vias - 1);
+        if ((Integer) jSpinner2.getValue() >= Mips.vias) {
+            jSpinner2.setValue(Mips.vias - 1);
         } else {
             if ((Integer) jSpinner2.getValue() < 0) {
                 jSpinner2.setValue(0);
@@ -1013,14 +1078,14 @@ public class Frame extends JFrame {
 
     private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
         if (evt.getClickCount() == 2 && jButton1.getText() == "Rodar") {
-            instrucMem = new Memoria_instrucoes(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
+            instrucMem = new CacheInstrucoes(Mips.tamCache, Mips.vias);
             inserirInterface();
         }
     }//GEN-LAST:event_jLabel3MouseClicked
 
     private void jLabel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseClicked
         if (evt.getClickCount() == 2 && jButton1.getText() == "Rodar") {
-            dadosMem = new Memoria_dados(Mips_Multiciclo.tamCache, Mips_Multiciclo.vias);
+            dadosMem = new CacheDados(Mips.tamCache, Mips.vias);
             inserirInterface();
         }
     }//GEN-LAST:event_jLabel4MouseClicked

@@ -3,10 +3,10 @@ package mips_multiciclo;
 
 import static java.lang.Math.pow;
 
-public class Unidade_de_Controle {
+public class UnidadeDeControle {
 
-    
-    private static final byte NOME_DA_CONSTANTE = 0b100000; 
+    private static final byte NOME_DA_CONSTANTE = 0b100000;
+
     /*private static int RegDst;
     private static int Branch;
     private static int LeMem;
@@ -38,36 +38,36 @@ public class Unidade_de_Controle {
                     if (funct == 0 || funct == 0b10) {
                         FonteA = (inst >> 6) & 0b11111;
                     } else {
-                        FonteA = Registradores.Registradores[(inst >> 21) & 0b11111];
+                        FonteA = BancoRegs.Registradores[(inst >> 21) & 0b11111];
                     }
                     if (funct == 0b001000) {
-                        FonteB = Registradores.Registradores[0];
+                        FonteB = BancoRegs.Registradores[0];
                         PC.Contador = ((ULA.Operacao(opcode, funct, FonteA, FonteB)) - 1) / 4;
                         return;
                     }
-                    FonteB = Registradores.Registradores[(inst >> 16) & 0b11111];
+                    FonteB = BancoRegs.Registradores[(inst >> 16) & 0b11111];
                     if (funct == 0b101010) {
                         if (ULA.Operacao(opcode, funct, FonteA, FonteB) > 0) {
-                            Registradores.Registradores[(inst >> 11) & 0b11111] = 0;
+                            BancoRegs.Registradores[(inst >> 11) & 0b11111] = 0;
                             return;
                         } else {
-                            Registradores.Registradores[(inst >> 11) & 0b11111] = 1;
+                            BancoRegs.Registradores[(inst >> 11) & 0b11111] = 1;
                             return;
                         }
                     }
-                    Registradores.Registradores[(inst >> 11) & 0b11111] = ULA.Operacao(opcode, funct, FonteA, FonteB);
+                    BancoRegs.Registradores[(inst >> 11) & 0b11111] = ULA.Operacao(opcode, funct, FonteA, FonteB);
                     break;
                 case 2://Operações Imediatas
                     funct = opcode & 0b1111;
-                    FonteA = Registradores.Registradores[(inst >> 21) & 0b11111];
+                    FonteA = BancoRegs.Registradores[(inst >> 21) & 0b11111];
                     if (opcode == 0b000100) {
-                        FonteB = Registradores.Registradores[(inst >> 16) & 0b11111];
+                        FonteB = BancoRegs.Registradores[(inst >> 16) & 0b11111];
                         if ((ULA.Operacao(opcode, funct, FonteA, FonteB)) == 0) {
                             PC.Contador += (inst & 0b1111111111111111);
                         }
                     } else {
                         if (opcode == 0b000101) {
-                            FonteB = Registradores.Registradores[(inst >> 16) & 0b11111];
+                            FonteB = BancoRegs.Registradores[(inst >> 16) & 0b11111];
                             if ((ULA.Operacao(opcode, funct, FonteA, FonteB)) != 0) {
                                 PC.Contador += (inst & 0b1111111111111111);
                             }
@@ -75,12 +75,12 @@ public class Unidade_de_Controle {
                             FonteB = inst & 0b1111111111111111;
                             if (opcode == 0b001010) {
                                 if (ULA.Operacao(opcode, funct, FonteA, FonteB) > 0) {
-                                    Registradores.Registradores[(inst >> 16) & 0b11111] = 0;
+                                    BancoRegs.Registradores[(inst >> 16) & 0b11111] = 0;
                                 } else {
-                                    Registradores.Registradores[(inst >> 16) & 0b11111] = 1;
+                                    BancoRegs.Registradores[(inst >> 16) & 0b11111] = 1;
                                 }
                             } else {
-                                Registradores.Registradores[(inst >> 16) & 0b11111] = ULA.Operacao(opcode, funct, FonteA, FonteB);
+                                BancoRegs.Registradores[(inst >> 16) & 0b11111] = ULA.Operacao(opcode, funct, FonteA, FonteB);
                             }
                         }
                     }
@@ -90,18 +90,23 @@ public class Unidade_de_Controle {
                      via,
                      endereco;
                     funct = 0;
-                    FonteA = Registradores.Registradores[(inst >> 21) & 0b11111];
+                    FonteA = BancoRegs.Registradores[(inst >> 21) & 0b11111];
                     FonteB = inst & 0b1111111111111111;
-                    indice = (FonteB) & ((int) (pow(2, Mips_Multiciclo.indiceTam))) - 1;
                     endereco = ((ULA.Operacao(opcode, funct, FonteA, FonteB)) / 4);
-                    via = Mips_Multiciclo.frame.dadosMem.buscarEnd(endereco);
+                    indice = ((endereco >> 2) & ((int) (pow(2, Mips.indiceTam))) - 1);
+                    via = Mips.frame.dadosMem.buscarEnd(endereco);
                     if (via == -1) {
-                        via = Mips_Multiciclo.frame.dadosMem.setMemoria(endereco);
+                        Mips.frame.falhaDados++;
+                        Mips.frame.acertoDados++;
+                        via = Mips.frame.dadosMem.setMemoria(endereco);
+                        Mips.frame.inserirTexto("Dados da instrução " + (PC.Contador * 4) + " não encontrada na cache, inserindo na cache de dados " + via + ".\n");
+                    }else{
+                        Mips.frame.acertoDados++;
                     }
                     if ((opcode & 0b101000) == 0b101000) {//If = SW    else = LW
-                        Mips_Multiciclo.frame.dadosMem.Blocos[indice][via].Palavra[(FonteB / 4) & 0b11] = Registradores.Registradores[(inst >> 16) & 0b11111];
+                        Mips.frame.dadosMem.Blocos[indice][via].Palavra[(FonteB / 4) & 0b11] = BancoRegs.Registradores[(inst >> 16) & 0b11111];
                     } else {
-                        Registradores.Registradores[(inst >> 16) & 0b11111] = Mips_Multiciclo.frame.dadosMem.Blocos[indice][via].Palavra[(FonteB / 4) & 0b11];
+                        BancoRegs.Registradores[(inst >> 16) & 0b11111] = Mips.frame.dadosMem.Blocos[indice][via].Palavra[(FonteB / 4) & 0b11];
                     }
                     switch ((FonteB / 4) & 0b11) {
                         case 1:
@@ -114,15 +119,15 @@ public class Unidade_de_Controle {
                             endereco -= 3;
                             break;
                     }
-                    Memoria_principal.setMemoriaDado((endereco + Mips_Multiciclo.tamPrincipal / 2), Mips_Multiciclo.frame.dadosMem.Blocos[indice][via].Palavra[0]);
-                    Memoria_principal.setMemoriaDado((endereco + Mips_Multiciclo.tamPrincipal / 2) + 1, Mips_Multiciclo.frame.dadosMem.Blocos[indice][via].Palavra[1]);
-                    Memoria_principal.setMemoriaDado((endereco + Mips_Multiciclo.tamPrincipal / 2) + 2, Mips_Multiciclo.frame.dadosMem.Blocos[indice][via].Palavra[2]);
-                    Memoria_principal.setMemoriaDado((endereco + Mips_Multiciclo.tamPrincipal / 2) + 3, Mips_Multiciclo.frame.dadosMem.Blocos[indice][via].Palavra[3]);
+                    MemoriaPrincipal.setMemoriaDado((endereco + Mips.tamPrincipal / 2), Mips.frame.dadosMem.Blocos[indice][via].Palavra[0]);
+                    MemoriaPrincipal.setMemoriaDado((endereco + Mips.tamPrincipal / 2) + 1, Mips.frame.dadosMem.Blocos[indice][via].Palavra[1]);
+                    MemoriaPrincipal.setMemoriaDado((endereco + Mips.tamPrincipal / 2) + 2, Mips.frame.dadosMem.Blocos[indice][via].Palavra[2]);
+                    MemoriaPrincipal.setMemoriaDado((endereco + Mips.tamPrincipal / 2) + 3, Mips.frame.dadosMem.Blocos[indice][via].Palavra[3]);
 
                     break;
                 case 4:
                     if (opcode == 0b11) {
-                        Registradores.Registradores[31] = (PC.Contador + 1) * 4;
+                        BancoRegs.Registradores[31] = (PC.Contador + 1) * 4;
                     }
                     PC.Contador = ((inst & 0b00000011111111111111111111111111) - 1) / 4;
                     break;
