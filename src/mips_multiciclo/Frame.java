@@ -92,6 +92,7 @@ public class Frame extends JFrame {
             this.instrucMem = new CacheInstrucoes(Mips.tamCache, Mips.vias);
             for (PC.Contador = 0; PC.Contador < Mips.tamPrincipal / 2; PC.Contador++) {
                 if (CacheInstrucoes.decode(MemoriaPrincipal.memoria[PC.Contador]) != 0) {
+                    this.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 0\n");
                     via = instrucMem.buscarEnd(PC.Contador);
                     if (via == -1) {
                         this.falhaInst++;
@@ -102,6 +103,7 @@ public class Frame extends JFrame {
                     } else {
                         this.acertoInst++;
                     }
+                    this.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 1\n");
                     UnidadeDeControle.decodeULA(instrucMem.Blocos[(PC.Contador >> 2) & ((int) (pow(2, Mips.indiceTam))) - 1][via].Palavra[PC.Contador & 0b11]);
                 }
             }
@@ -658,7 +660,7 @@ public class Frame extends JFrame {
             }
         });
 
-        jButton3.setText("Inserir instruções");
+        jButton3.setText("Inserir Instruções");
         jButton3.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jButton3MouseClicked(evt);

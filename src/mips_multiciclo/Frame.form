@@ -618,7 +618,7 @@
     </Component>
     <Component class="javax.swing.JButton" name="jButton3">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Inserir instru&#xe7;&#xf5;es"/>
+        <Property name="text" type="java.lang.String" value="Inserir Instru&#xe7;&#xf5;es"/>
       </Properties>
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jButton3MouseClicked"/>
