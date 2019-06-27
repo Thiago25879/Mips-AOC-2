@@ -30,7 +30,7 @@ public class TxtFileFilter extends javax.swing.filechooser.FileFilter {
                     while (cont < 13) {
                         
                         if((int)reader.read() != (int) test.charAt(cont)){
-                            System.out.println((int) reader.read()+" - "+ (int) test.charAt(cont));
+                            //System.out.println((int) reader.read()+" - "+ (int) test.charAt(cont));
                             return false;
                         }
                         cont++;

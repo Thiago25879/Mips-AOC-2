@@ -85,7 +85,7 @@ public class CacheDados {
 
         int via = encontrarBloco(endereco);
         Bloco bloco = this.Blocos[(endereco >> 2) & ((int) (pow(2, Mips.indiceTam))) - 1][via];
-        System.out.println((endereco >> 2) & ((int) (pow(2, Mips.indiceTam))) - 1);
+        //System.out.println((endereco >> 2) & ((int) (pow(2, Mips.indiceTam))) - 1);
         bloco.Validade = true;
         bloco.Tag = endereco >> (2 + Mips.indiceTam);
         switch (endereco & 0b11) {

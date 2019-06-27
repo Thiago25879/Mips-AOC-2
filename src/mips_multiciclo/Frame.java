@@ -28,6 +28,7 @@ public class Frame extends JFrame {
     public CacheInstrucoes instrucMem;
     public CacheDados dadosMem;
     int blocoMem;
+    int ciclosCont = 0;
     float falhaDados, falhaInst, acertoDados, acertoInst;
 
     public Frame() {
@@ -80,6 +81,7 @@ public class Frame extends JFrame {
         if (!"Desbloquear".equals(jButton1.getText())) {
             int via = 0;
             PC.Contador = 0;
+            ciclosCont = 0;
             this.falhaDados = 0;
             this.falhaInst = 0;
             this.acertoDados = 0;
@@ -93,17 +95,20 @@ public class Frame extends JFrame {
             for (PC.Contador = 0; PC.Contador < Mips.tamPrincipal / 2; PC.Contador++) {
                 if (CacheInstrucoes.decode(MemoriaPrincipal.memoria[PC.Contador]) != 0) {
                     this.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 0\n");
+                    ciclosCont++;
                     via = instrucMem.buscarEnd(PC.Contador);
                     if (via == -1) {
                         this.falhaInst++;
                         this.acertoInst++;
                         via = instrucMem.setMemoria(PC.Contador);
                         jTextArea1.append("Instrução " + (PC.Contador * 4) + " não encontrada na cache, inserindo na cache " + via + ".\n");
+                        ciclosCont += 50;
 
                     } else {
                         this.acertoInst++;
                     }
                     this.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 1\n");
+                    ciclosCont++;
                     UnidadeDeControle.decodeULA(instrucMem.Blocos[(PC.Contador >> 2) & ((int) (pow(2, Mips.indiceTam))) - 1][via].Palavra[PC.Contador & 0b11]);
                 }
             }
@@ -112,6 +117,7 @@ public class Frame extends JFrame {
                 jTextArea1.append("Execução terminada\n Porcentagem de falhas de instrução:" + resultado + "%.");
                 resultado = ((falhaDados / acertoDados) * 100);
                 jTextArea1.append("\n Porcentagem de falhas de dados:" + resultado + "%.");
+                jTextArea1.append("\n Número de ciclos transcorridos: " + ciclosCont);
             }
             PC.Contador--;
             jButton1.setText("Desbloquear");
@@ -135,6 +141,7 @@ public class Frame extends JFrame {
             jTextArea1.setFocusable(false);
             jTextArea1.setEditable(false);
             jTextArea1.setText("                    Iniciando Execução passo a passo\n");
+            ciclosCont = 0;
             this.falhaDados = 0;
             this.falhaInst = 0;
             this.acertoDados = 0;
@@ -149,6 +156,9 @@ public class Frame extends JFrame {
             this.instrucMem = new CacheInstrucoes(Mips.tamCache, Mips.vias);
             this.dadosMem = new CacheDados(Mips.tamCache, Mips.vias);
         } else {
+
+            this.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 0\n");
+            ciclosCont++;
             while (PC.Contador < Mips.tamPrincipal / 2 && CacheInstrucoes.decode(MemoriaPrincipal.memoria[PC.Contador]) == 0) {
                 PC.Contador++;
             }
@@ -158,11 +168,16 @@ public class Frame extends JFrame {
                 via = instrucMem.buscarEnd(PC.Contador);
                 if (via == -1) {
                     this.falhaInst++;
-                    jTextArea1.append("Instrução " + (PC.Contador * 4) + " não encontrada na cache\n");
+                    ciclosCont += 50;
                     via = instrucMem.setMemoria(PC.Contador);
+                    jTextArea1.append("Instrução " + (PC.Contador * 4) + " não encontrada na cache, inserindo na cache " + via + ".\n");
+                    
                 } else {
                     this.acertoInst++;
                 }
+
+                this.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 1\n");
+                ciclosCont++;
                 UnidadeDeControle.decodeULA(instrucMem.Blocos[(PC.Contador >> 2) & ((int) (pow(2, Mips.indiceTam))) - 1][via].Palavra[PC.Contador & 0b11]);
 
             }
@@ -172,6 +187,7 @@ public class Frame extends JFrame {
                     jTextArea1.append("Execução terminada\n Porcentagem de falhas de instrução:" + resultado + "%.");
                     resultado = ((falhaDados / acertoDados) * 100);
                     jTextArea1.append("\n Porcentagem de falhas de dados:" + resultado + "%.");
+                    jTextArea1.append("\n Número de ciclos transcorridos: " + ciclosCont);
                 }
             } else {
                 PC.Contador++;
@@ -333,8 +349,8 @@ public class Frame extends JFrame {
     public void inserirTexto(String texto) {
         jTextArea1.append(texto);
     }
-    
-    public void salvarDados(){
+
+    public void salvarDados() {
         fc.setFileSelectionMode(JFileChooser.SAVE_DIALOG);
         int returnVal = fc.showSaveDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -849,8 +865,8 @@ public class Frame extends JFrame {
                 jTextArea1.setText("");
                 jButton1.setText("Rodar");
                 jButton2.setText("Passo a Passo");
-                
-            jButton3.setText("Inserir Instruções");
+
+                jButton3.setText("Inserir Instruções");
                 this.instrucMem = new CacheInstrucoes(Mips.tamCache, Mips.vias);
                 this.dadosMem = new CacheDados(Mips.tamCache, Mips.vias);
             }
@@ -866,8 +882,8 @@ public class Frame extends JFrame {
                 PC.Contador += instNum;
             }
             inserirInterface();
-        }else{
-            if(jButton3.getText() == "Salvar Log"){
+        } else {
+            if (jButton3.getText() == "Salvar Log") {
                 this.salvarDados();
             }
         }
