@@ -5,16 +5,8 @@ import static java.lang.Math.pow;
 
 public class UnidadeDeControle {
 
-    //private static final byte NOME_DA_CONSTANTE = 0b100000;
-    /*private static int RegDst;
-    private static int Branch;
-    private static int LeMem;
-    private static int MemparaReg;
-    private static int OpULA;
-    private static int EscreveMem;
-    private static int OrigULA;
-    private static int EscreveReg;*/
-    public static void decodeULA(int inst) {
+    //Recebe a instrução e executa as operações adequadas
+    public static void executarInst(int inst) {
         if (inst != 0) {
             int funct, opcode, FonteA, FonteB, tipo;
             opcode = inst >> 26;
@@ -52,23 +44,24 @@ public class UnidadeDeControle {
                     if (funct == 0b101010) {
                         Mips.frame.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 2\n");
                         Mips.frame.ciclosCont++;
+                        System.out.println(ULA.Operacao(opcode, funct, FonteA, FonteB));
                         if (ULA.Operacao(opcode, funct, FonteA, FonteB) > 0) {
                             Mips.frame.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 3\n");
-                        Mips.frame.ciclosCont++;
+                            Mips.frame.ciclosCont++;
                             BancoRegs.Registradores[(inst >> 11) & 0b11111] = 0;
                             return;
                         } else {
                             Mips.frame.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 3\n");
-                        Mips.frame.ciclosCont++;
+                            Mips.frame.ciclosCont++;
                             BancoRegs.Registradores[(inst >> 11) & 0b11111] = 1;
                             return;
                         }
                     }
                     Mips.frame.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 2\n");
-                        Mips.frame.ciclosCont++;
+                    Mips.frame.ciclosCont++;
                     BancoRegs.Registradores[(inst >> 11) & 0b11111] = ULA.Operacao(opcode, funct, FonteA, FonteB);
                     Mips.frame.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 3\n");
-                        Mips.frame.ciclosCont++;
+                    Mips.frame.ciclosCont++;
                     break;
                 case 2://Operações Imediatas
                     funct = opcode & 0b1111;
@@ -77,7 +70,7 @@ public class UnidadeDeControle {
                         FonteB = BancoRegs.Registradores[(inst >> 16) & 0b11111];
                         if ((ULA.Operacao(opcode, funct, FonteA, FonteB)) == 0) {
                             Mips.frame.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 2\n");
-                        Mips.frame.ciclosCont++;
+                            Mips.frame.ciclosCont++;
                             PC.Contador += (inst & 0b1111111111111111);
                         }
                     } else {
@@ -85,27 +78,27 @@ public class UnidadeDeControle {
                             FonteB = BancoRegs.Registradores[(inst >> 16) & 0b11111];
                             if ((ULA.Operacao(opcode, funct, FonteA, FonteB)) != 0) {
                                 Mips.frame.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 2\n");
-                        Mips.frame.ciclosCont++;
+                                Mips.frame.ciclosCont++;
                                 PC.Contador += (inst & 0b1111111111111111);
                             }
                         } else {
                             FonteB = inst & 0b1111111111111111;
                             if (opcode == 0b001010) {
                                 Mips.frame.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 2\n");
-                        Mips.frame.ciclosCont++;
+                                Mips.frame.ciclosCont++;
                                 if (ULA.Operacao(opcode, funct, FonteA, FonteB) > 0) {
                                     BancoRegs.Registradores[(inst >> 16) & 0b11111] = 0;
                                 } else {
                                     BancoRegs.Registradores[(inst >> 16) & 0b11111] = 1;
                                 }
                                 Mips.frame.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 3\n");
-                        Mips.frame.ciclosCont++;
+                                Mips.frame.ciclosCont++;
                             } else {
                                 Mips.frame.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 2\n");
-                        Mips.frame.ciclosCont++;
+                                Mips.frame.ciclosCont++;
                                 BancoRegs.Registradores[(inst >> 16) & 0b11111] = ULA.Operacao(opcode, funct, FonteA, FonteB);
                                 Mips.frame.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 3\n");
-                        Mips.frame.ciclosCont++;
+                                Mips.frame.ciclosCont++;
                             }
                         }
                     }
@@ -125,7 +118,7 @@ public class UnidadeDeControle {
                         Mips.frame.acertoDados++;
                         via = Mips.frame.dadosMem.setMemoria(endereco);
                         Mips.frame.inserirTexto("Dados da instrução " + (PC.Contador * 4) + " não encontrada na cache, inserindo na cache de dados " + via + ".\n");
-                        Mips.frame.ciclosCont+=50;
+                        Mips.frame.ciclosCont += 50;
                     } else {
                         Mips.frame.acertoDados++;
                     }
@@ -158,11 +151,11 @@ public class UnidadeDeControle {
                     MemoriaPrincipal.setMemoriaDado((endereco + Mips.tamPrincipal / 2) + 2, Mips.frame.dadosMem.Blocos[indice][via].Palavra[2]);
                     MemoriaPrincipal.setMemoriaDado((endereco + Mips.tamPrincipal / 2) + 3, Mips.frame.dadosMem.Blocos[indice][via].Palavra[3]);
                     Mips.frame.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 4\n");
-                        Mips.frame.ciclosCont++;
+                    Mips.frame.ciclosCont++;
                     break;
                 case 4:
                     Mips.frame.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 2\n");
-                        Mips.frame.ciclosCont++;
+                    Mips.frame.ciclosCont++;
                     if (opcode == 0b11) {
                         BancoRegs.Registradores[31] = (PC.Contador + 1) * 4;
                     }

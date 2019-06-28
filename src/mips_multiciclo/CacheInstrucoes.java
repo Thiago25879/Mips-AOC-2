@@ -6,8 +6,10 @@ import java.util.ArrayList;
 
 public class CacheInstrucoes {
 
+    //Matriz de blocos não iniciados pois é configurado pelo usuário
     public Bloco[][] Blocos;
 
+    //Inicializa a cache de intruções no tamanho de indices e de vias recebidos
     public CacheInstrucoes(int numIndices, int numVias) {
         this.Blocos = new Bloco[numIndices][numVias];
         for (int x = 0; x < numIndices; x++) {
@@ -18,6 +20,7 @@ public class CacheInstrucoes {
         }
     }
 
+    //Carrega dados formatados para substituir toda a cache (apenas utilizado em carregamento de arquivo)
     public void setMemoriaInst(String dados) {
         int S = 0;
         ArrayList list = new ArrayList();
@@ -54,36 +57,41 @@ public class CacheInstrucoes {
         }
     }
 
-    public String toString(int indice, int bloco, int palavra) {
+    //Recebe o local e retorna o valor daquele local formatado e em hexadecimal
+    public String retornaTextoHex(int indice, int bloco, int palavra) {
         return "Ind. " + indice + ", Palav. " + palavra + " : " + Integer.toHexString(Blocos[indice][bloco].Palavra[palavra]).toUpperCase();
     }
 
-    public String toStringD(int indice, int bloco, int palavra) {
+    //Recebe o local e retorna o valor daquele local formatado e em decimal
+    public String retornaTextoDec(int indice, int bloco, int palavra) {
         return "Ind. " + indice + ", Palav. " + palavra + " : " + Integer.toString(Blocos[indice][bloco].Palavra[palavra]).toUpperCase();
     }
 
-    public String[] tostring(int bloco) {
+    //Recebe o bloco e retorna todos os seus valores formatados e como hexadecimal
+    public String[] comoTextoHex(int bloco) {
         String temp[] = new String[Mips.tamCache * 4];
         for (int indice = 0; indice < Mips.tamCache; indice++) {
             for (int palavra = 0; palavra < 4; palavra++) {
                 temp[(indice * 4) + palavra] = new String();
-                temp[(indice * 4) + palavra] = toString(indice, bloco, palavra);
+                temp[(indice * 4) + palavra] = retornaTextoHex(indice, bloco, palavra);
             }
         }
         return temp;
     }
 
-    public String[] tostringD(int bloco) {
+    //Recebe o bloco e retorna todos os seus valores formatados e como decimal
+    public String[] comoTextoDec(int bloco) {
         String temp[] = new String[Mips.tamCache * 4];
         for (int indice = 0; indice < Mips.tamCache; indice++) {
             for (int palavra = 0; palavra < 4; palavra++) {
                 temp[(indice * 4) + palavra] = new String();
-                temp[(indice * 4) + palavra] = toStringD(indice, bloco, palavra);
+                temp[(indice * 4) + palavra] = retornaTextoDec(indice, bloco, palavra);
             }
         }
         return temp;
     }
 
+    //Recebe o endereço da instrução e caso ela já esteja em algum bloco retorna o número do bloco, senão retorna -1
     public int buscarEnd(int endereco) {
         int indice, tag;
         tag = endereco >> (2 + Mips.indiceTam);
@@ -97,6 +105,7 @@ public class CacheInstrucoes {
         return -1;
     }
 
+    //Recebe o endereço e passa todo o bloco para a cache de instruções (todas as 4 palavras)
     public int setMemoria(int endereco) {
 
         int via = encontrarBloco(endereco);
@@ -114,13 +123,14 @@ public class CacheInstrucoes {
                 endereco -= 3;
                 break;
         }
-        bloco.Palavra[0] = CacheInstrucoes.decode(MemoriaPrincipal.memoria[endereco]);
-        bloco.Palavra[1] = CacheInstrucoes.decode(MemoriaPrincipal.memoria[endereco + 1]);
-        bloco.Palavra[2] = CacheInstrucoes.decode(MemoriaPrincipal.memoria[endereco + 2]);
-        bloco.Palavra[3] = CacheInstrucoes.decode(MemoriaPrincipal.memoria[endereco + 3]);
+        bloco.Palavra[0] = CacheInstrucoes.decodificarInst(MemoriaPrincipal.memoria[endereco]);
+        bloco.Palavra[1] = CacheInstrucoes.decodificarInst(MemoriaPrincipal.memoria[endereco + 1]);
+        bloco.Palavra[2] = CacheInstrucoes.decodificarInst(MemoriaPrincipal.memoria[endereco + 2]);
+        bloco.Palavra[3] = CacheInstrucoes.decodificarInst(MemoriaPrincipal.memoria[endereco + 3]);
         return via;
     }
 
+    //Busca o bloco que o LRU indica que deve ser substituido, isto apenas se o número de vias for diferente de 1
     public int encontrarBloco(int endereco) {
         if (Mips.vias != 1) {
             int indice = (endereco >> 2) & ((int) (pow(2, Mips.indiceTam))) - 1;
@@ -139,7 +149,8 @@ public class CacheInstrucoes {
         }
     }
 
-    public static int decode(String instrucao) {
+    //Recebe a instrução em texto e a retorna em binário, pronta para ser executada
+    public static int decodificarInst(String instrucao) {
         //Tipo: 0 = Aritmetico, 1 = Imediato, 2 = Jump, 3 = Memoria, 4 = LUI, 5 = Beq, 6 = Jr , 7 = Shifts
         try {
             int instBit = 0, tipo;
@@ -301,6 +312,7 @@ public class CacheInstrucoes {
         }
     }
 
+    //Remove tudo que não é importante para a identificação da instrução
     private static String[] limparInstrucao(String instrucao) {
         instrucao = instrucao.replaceAll(",", " ");
         instrucao = instrucao.replaceAll("\\(", " ");
@@ -310,6 +322,7 @@ public class CacheInstrucoes {
         return separado;
     }
 
+    //Retorna o endereco do banco de registradores que a String representa
     private static int decodificarReg(String temp) throws Exception {
         temp = temp.replaceAll("\\$", "");
         temp = temp.toLowerCase();

@@ -6,7 +6,8 @@ public class PC {
 
     public static int Contador = 0;
 
-    public static String paraString() {
+    //Retorna o contador atual formatado
+    public static String comoTexto() {
         return "PC: " + Contador*4;
     }
 

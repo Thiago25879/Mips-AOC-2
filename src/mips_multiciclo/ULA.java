@@ -3,6 +3,7 @@ package mips_multiciclo;
 
 public class ULA {
 
+    //Unidade lógica e aritmética o mais fiél possivel ao MIPS verdadeiro
     public static int Operacao(int Opcode, int funct, int FonteA, int FonteB) {
         int tipo;
         if (0b100000 == (Opcode & 0b100000)) {

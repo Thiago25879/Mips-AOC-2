@@ -2,8 +2,10 @@ package mips_multiciclo;
 
 public class MemoriaPrincipal {
 
+    //Aloca a memoria principal de modo estático do tamanho da variavel na main
     public static String memoria[] = new String[Mips.tamPrincipal];
 
+    //Recebe o local inicial e instruções de multiplas linhas para ser inserido na memoria principal
     public static String setMemoriaMult(int local, String instrucoes) {
         boolean test = true;
         String[] temp = instrucoes.split("\n");
@@ -24,10 +26,11 @@ public class MemoriaPrincipal {
         }
     }
 
+    //Recebe um booleano se a String é instrução, o local e a string a ser inserida
     public static boolean setMemoria(boolean isInst, int local, String instrucao) {
         try {
             if (isInst) {
-                if (CacheInstrucoes.decode(instrucao) != 0) {
+                if (CacheInstrucoes.decodificarInst(instrucao) != 0) {
                     MemoriaPrincipal.memoria[local] = instrucao;
                     return true;
                 }
@@ -47,6 +50,7 @@ public class MemoriaPrincipal {
         return false;
     }
 
+    //Insere o dado na memoria principal (apenas dados, sem instruções)
     public static boolean setMemoriaDado(int local, int dado) {
         try {
             MemoriaPrincipal.memoria[local] = String.valueOf(dado);
@@ -57,8 +61,8 @@ public class MemoriaPrincipal {
         return false;
     }
 
-    public static String toString(int x) {
-        // You can change this to suite the presentation of a list item
+    //Retorna o valor da memoria principal no espaço inserido
+    public static String retornaTexto(int x) {
         int y = x;
         if (x >= Mips.tamPrincipal / 2) {
             x -= Mips.tamPrincipal / 2;
@@ -68,24 +72,25 @@ public class MemoriaPrincipal {
         }
     }
 
-    public static String[] paraString(int tipo) {
+    //Recebe se deve ser retornado como texto apenas instruções, apenas dados ou tudo
+    public static String[] comoTexto(int tipo) {
         int x = 0;
         String temp[];
         if (tipo == 0) {
             temp = new String[Mips.tamPrincipal];
             for (x = 0; x < Mips.tamPrincipal; x++) {
-                temp[x] = toString(x);
+                temp[x] = retornaTexto(x);
             }
         } else {
             temp = new String[Mips.tamPrincipal / 2];
             if (tipo == 1) {
                 for (x = 0; x < Mips.tamPrincipal / 2; x++) {
-                    temp[x] = toString(x);
+                    temp[x] = retornaTexto(x);
                 }
             } else {
                 try {
                     for (x = Mips.tamPrincipal / 2; x < Mips.tamPrincipal; x++) {
-                        temp[x - Mips.tamPrincipal / 2] = toString(x);
+                        temp[x - Mips.tamPrincipal / 2] = retornaTexto(x);
                     }
                 } catch (ArrayIndexOutOfBoundsException e) {
                     

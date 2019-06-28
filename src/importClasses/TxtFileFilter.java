@@ -14,11 +14,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TxtFileFilter extends javax.swing.filechooser.FileFilter {
-    //Exemplo para o futuro
-    //private final String[] okFileExtensions = new String[] {"txt", "png", "gif"};
 
+    //Recebe todos os formatos que devem ser aceitos
     private final String[] okFileExtensions = new String[]{"txt"};
-
+    
+    //Função de comparação de cabeçalho txt
     @Override
     public boolean accept(File file) {
         for (String extension : okFileExtensions) {
@@ -30,7 +30,6 @@ public class TxtFileFilter extends javax.swing.filechooser.FileFilter {
                     while (cont < 13) {
                         
                         if((int)reader.read() != (int) test.charAt(cont)){
-                            //System.out.println((int) reader.read()+" - "+ (int) test.charAt(cont));
                             return false;
                         }
                         cont++;
