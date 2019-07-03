@@ -28,7 +28,7 @@ public class ULA {
                 if (funct == 0b100000 || funct == 0b1000) {
                     return FonteA + FonteB;
                 }
-                if (funct == 0b100010 || funct == 0b1010) {
+                if (funct == 0b100010 || funct == 0b1010 || funct == 0b101010) {
                     return FonteA - FonteB;
                 }
                 if (funct == 0b100100 || funct == 0b1100) {

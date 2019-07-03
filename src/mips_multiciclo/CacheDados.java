@@ -104,7 +104,7 @@ public class CacheDados {
             case 3:
                 endereco -= 3;
                 break;
-        }
+        } 
         endereco += (Mips.tamPrincipal / 2);
         bloco.Palavra[0] = Integer.parseInt(MemoriaPrincipal.memoria[endereco]);
         bloco.Palavra[1] = Integer.parseInt(MemoriaPrincipal.memoria[endereco + 1]);

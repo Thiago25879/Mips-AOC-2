@@ -99,7 +99,7 @@ public class Frame extends JFrame {
             this.instrucMem = new CacheInstrucoes(Mips.tamCache, Mips.vias);
             for (PC.Contador = 0; PC.Contador < Mips.tamPrincipal / 2; PC.Contador++) {
                 if (CacheInstrucoes.decodificarInst(MemoriaPrincipal.memoria[PC.Contador]) != 0) {
-                    this.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 0\n");
+                    this.inserirTexto("Instrução " + (PC.Contador * 4) + " : Executando Ciclo 0\n");
                     ciclosCont++;
                     via = instrucMem.buscarEnd(PC.Contador);
                     if (via == -1) {
@@ -112,7 +112,7 @@ public class Frame extends JFrame {
                     } else {
                         this.acertoInst++;
                     }
-                    this.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 1\n");
+                    this.inserirTexto("Instrução " + (PC.Contador * 4) + " : Executando Ciclo 1\n");
                     ciclosCont++;
                     UnidadeDeControle.executarInst(instrucMem.Blocos[(PC.Contador >> 2) & ((int) (pow(2, Mips.indiceTam))) - 1][via].Palavra[PC.Contador & 0b11]);
                 }
@@ -163,7 +163,7 @@ public class Frame extends JFrame {
             this.dadosMem = new CacheDados(Mips.tamCache, Mips.vias);
         } else {
 
-            this.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 0\n");
+            this.inserirTexto("Instrução " + (PC.Contador * 4) + " : Executando Ciclo 0\n");
             ciclosCont++;
             while (PC.Contador < Mips.tamPrincipal / 2 && CacheInstrucoes.decodificarInst(MemoriaPrincipal.memoria[PC.Contador]) == 0) {
                 PC.Contador++;
@@ -177,12 +177,12 @@ public class Frame extends JFrame {
                     ciclosCont += 50;
                     via = instrucMem.setMemoria(PC.Contador);
                     jTextArea1.append("Instrução " + (PC.Contador * 4) + " não encontrada na cache, inserindo na cache " + via + ".\n");
-                    
+
                 } else {
                     this.acertoInst++;
                 }
 
-                this.inserirTexto("Instruc. " + (PC.Contador) + " : Executando Ciclo 1\n");
+                this.inserirTexto("Instrução " + (PC.Contador * 4) + " : Executando Ciclo 1\n");
                 ciclosCont++;
                 UnidadeDeControle.executarInst(instrucMem.Blocos[(PC.Contador >> 2) & ((int) (pow(2, Mips.indiceTam))) - 1][via].Palavra[PC.Contador & 0b11]);
 
@@ -216,7 +216,15 @@ public class Frame extends JFrame {
     //Inicializa os registradores
     public void inicializarRegistradores() {
         for (int x = 0; x < BancoRegs.Registradores.length; x++) {
-            BancoRegs.Registradores[x] = 0;
+            if (x == 28) {
+                BancoRegs.Registradores[x] = Mips.tamPrincipal*2;
+            } else {
+                if (x == 29 || x == 30) {
+                    BancoRegs.Registradores[x] = Mips.tamPrincipal*4;
+                } else {
+                    BancoRegs.Registradores[x] = 0;
+                }
+            }
         }
     }
 
@@ -962,25 +970,27 @@ public class Frame extends JFrame {
 
     private void jTextField1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            try {
+                switch (jList2.getSelectedIndex()) {
+                    case 0:
+                    case 1:
+                    case 26:
+                    case 27:
+                        return;
+                    default:
+                        try {
+                            BancoRegs.Registradores[jList2.getSelectedIndex()] = Integer.parseInt(jTextField1.getText());
+                            jTextField1.setText("");
+                            atualizarInterface();
 
-            switch (jList2.getSelectedIndex()) {
-                case 0:
-                case 1:
-                case 26:
-                case 27:
-                    return;
-                default:
-                    try {
-                        BancoRegs.Registradores[jList2.getSelectedIndex()] = Integer.parseInt(jTextField1.getText());
-                        jTextField1.setText("");
-                        atualizarInterface();
+                        } catch (NumberFormatException e) {
+                            jTextField2.setText("");
+                        }
+                        break;
+                }
+            } catch (Exception e) {
 
-                    } catch (NumberFormatException e) {
-                        jTextField2.setText("");
-                    }
-                    break;
             }
-
         }
     }//GEN-LAST:event_jTextField1KeyPressed
 
